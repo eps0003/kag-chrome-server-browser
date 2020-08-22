@@ -1,0 +1,382 @@
+:root {
+	--text-color: rgb(235, 235, 245);
+	--textbox-placeholder-text-color: rgb(159, 165, 160);
+	--textbox-selection-text-color: var(--textbox-placeholder-text-color);
+	--textbox-selection-background-color: gray;
+	--link-text-color: rgb(254, 254, 210);
+	--button-disabled-text-color: rgb(129, 130, 129);
+
+	--background-color: rgb(126, 140, 121);
+	--button-background-color: rgb(100, 113, 96);
+	--indented-background-color: rgb(96, 106, 98);
+	--minimap-background-color: rgb(237, 204, 166);
+
+	--outer-border-color: rgb(66, 72, 75);
+	--inner-border-color: rgb(151, 167, 146);
+	--button-outer-border-color: rgb(19, 13, 29);
+	--box-shadow: inset 0 0 0 2px var(--outer-border-color), inset 0 0 0 4px var(--inner-border-color);
+	--indented-box-shadow: var(--box-shadow), inset 0 0 0 6px var(--outer-border-color);
+	--button-box-shadow: inset 0 0 0 2px var(--button-outer-border-color), inset 0 0 0 4px var(--background-color);
+
+	--filter-grid-height: 100px;
+}
+
+* {
+	font-family: "Arial", Sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	box-sizing: border-box;
+	user-select: none;
+}
+
+body {
+	margin: 0;
+	width: 800px;
+	color: var(--text-color);
+}
+
+main {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	grid-template-rows: 332px 3em var(--filter-grid-height);
+	grid-template-areas:
+		"servers info"
+		"search info"
+		"filters play";
+	grid-gap: 8px;
+	padding: 12px;
+}
+
+/* STYLES */
+
+.container {
+	background-color: var(--background-color);
+	box-shadow: var(--box-shadow);
+}
+
+.indented {
+	background-color: var(--indented-background-color);
+	box-shadow: var(--indented-box-shadow);
+	color: var(--text-color);
+	border: none;
+	outline: none;
+}
+
+.button {
+	background-color: var(--button-background-color);
+	box-shadow: var(--button-box-shadow);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--text-color);
+	cursor: pointer;
+}
+
+.button.disabled {
+	cursor: auto;
+	color: var(--button-disabled-text-color);
+}
+
+select {
+	-webkit-appearance: none;
+	appearance: none;
+	background-image: url(../images/arrow_down.png);
+	background-repeat: no-repeat;
+	background-position: calc(100% - 16px);
+	padding: 0px 24px 0px 8px;
+	text-align-last: center;
+	cursor: pointer;
+}
+
+input[type="text"],
+input[type="password"] {
+	padding: 0 12px;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+	color: var(--textbox-placeholder-text-color);
+}
+
+input[type="text"]::selection,
+input[type="password"]::selection {
+	background-color: var(--textbox-selection-background-color);
+	color: var(--textbox-selection-text-color);
+}
+
+a {
+	text-decoration: none;
+	color: var(--link-text-color);
+	pointer-events: all;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/* SERVER LIST */
+
+#server-list {
+	grid-area: servers;
+	box-shadow: 0 0 0 2px var(--inner-border-color), 0 0 0 4px var(--outer-border-color);
+	margin: 4px;
+	overflow-y: scroll;
+	padding: 2px;
+}
+
+#server-list::-webkit-scrollbar {
+	width: 30px;
+}
+
+#server-list::-webkit-scrollbar-track {
+	background-color: var(--background-color);
+	border: solid var(--button-outer-border-color);
+	border-width: 0 2px;
+	box-shadow: inset 0 0 0 2px var(--inner-border-color);
+}
+
+#server-list::-webkit-scrollbar-thumb {
+	background-color: var(--button-background-color);
+	box-shadow: var(--button-box-shadow);
+}
+
+#server-list::-webkit-scrollbar-button:single-button {
+	height: 30px;
+	background-color: var(--button-background-color);
+	box-shadow: var(--button-box-shadow);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+#server-list::-webkit-scrollbar-button:single-button:increment {
+	background-image: url(../images/arrow_down.png);
+}
+
+#server-list::-webkit-scrollbar-button:single-button:decrement {
+	background-image: url(../images/arrow_up.png);
+}
+
+/* SERVER INFO GRID */
+
+#server-info-grid {
+	grid-area: info;
+	display: grid;
+	grid-template-rows: 34px 100px 1fr;
+	grid-template-areas:
+		"gamemode"
+		"minimap"
+		"info";
+	padding: 4px 12px;
+}
+
+#gamemode {
+	grid-area: gamemode;
+	margin: auto 0;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#minimap {
+	grid-area: minimap;
+	cursor: -webkit-grab;
+	cursor: grab;
+}
+
+#minimap:active {
+	cursor: -webkit-grabbing;
+	cursor: grabbing;
+}
+
+#minimap img {
+	position: relative;
+	background-color: var(--minimap-background-color);
+}
+
+#info {
+	grid-area: info;
+	padding: 8px 0;
+	overflow-y: scroll;
+}
+
+#info::-webkit-scrollbar {
+	width: 0px;
+}
+
+/* EXTENSION INFO GRID */
+
+#extension-info-grid {
+	grid-area: info;
+	display: grid;
+	grid-template-rows: 1em 1em 1fr 1em;
+	grid-template-areas:
+		"name"
+		"count"
+		"body"
+		"footer";
+	padding: 12px;
+}
+
+#extension-info-grid * {
+	font-size: 11.8px;
+	text-align: center;
+}
+
+#extension-name {
+	grid-area: name;
+}
+
+#count {
+	grid-area: count;
+}
+
+#content {
+	grid-area: body;
+	text-align: left;
+	margin: auto;
+}
+
+#extension-info-grid footer {
+	grid-area: footer;
+}
+
+/* SEARCH GRID */
+
+#search-grid {
+	grid-area: search;
+	display: grid;
+	grid-template-columns: 7fr 4fr;
+	grid-template-areas: "search sort";
+	grid-column-gap: 8px;
+}
+
+#search {
+	grid-area: search;
+}
+
+#sort {
+	grid-area: sort;
+}
+
+/* FILTERS GRID */
+
+#filter-grid {
+	grid-area: filters;
+	display: grid;
+	grid-template-columns: 1fr 1fr calc(var(--filter-grid-height) - 12px);
+	grid-template-rows: 1fr 1fr;
+	grid-template-areas:
+		"players modded reload"
+		"gamemodes password reload";
+	grid-gap: 8px;
+	padding: 12px;
+}
+
+#players-grid {
+	grid-area: players;
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	grid-template-areas:
+		"min text max"
+		"slider slider slider";
+	position: relative;
+	height: calc(100% + 6px);
+	bottom: 6px;
+}
+
+#min-players {
+	grid-area: min;
+}
+
+#max-players {
+	grid-area: max;
+	text-align: right;
+}
+
+#players-text {
+	grid-area: text;
+	text-align: center;
+}
+
+#slider {
+	grid-area: slider;
+	position: absolute;
+	bottom: 3;
+	width: calc(100% - 12px);
+	height: 10px;
+	background-color: var(--background-color);
+	box-shadow: var(--box-shadow);
+	border: none;
+	outline: none;
+	border-radius: 0;
+	margin: 3px 6px;
+}
+
+#slider .ui-slider-handle {
+	width: 12px;
+	height: 22px;
+	background-color: var(--button-background-color);
+	box-shadow: var(--button-box-shadow);
+	border: none;
+	outline: none;
+	border-radius: 0;
+	cursor: pointer;
+	margin-left: -6px;
+	margin-top: -2px;
+}
+
+#slider .ui-slider-range {
+	background-color: var(--background-color);
+	box-shadow: var(--box-shadow);
+	height: 16px;
+	margin-top: -3px;
+}
+
+#gamemodes {
+	grid-area: gamemodes;
+}
+
+#modded {
+	grid-area: modded;
+}
+
+#password {
+	grid-area: password;
+}
+
+#modded,
+#password {
+	background-image: url(../images/button_unchecked.png);
+	background-repeat: no-repeat;
+	background-position: calc(50% + 38px);
+	justify-content: left;
+	padding-left: calc(50% - 46px);
+}
+
+#modded[value="1"],
+#password[value="1"] {
+	background-image: url(../images/button_cross.png);
+}
+
+#modded[value="2"],
+#password[value="2"] {
+	background-image: url(../images/button_tick.png);
+}
+
+#reload {
+	grid-area: reload;
+	background-image: url(../images/reload.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	position: relative;
+	bottom: 12px;
+	width: calc(100% + 12px);
+	height: calc(100% + 24px);
+}
+
+#reload:active {
+	background-position: 50% calc(50% + 2px);
+}

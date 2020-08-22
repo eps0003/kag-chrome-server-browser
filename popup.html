@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/popup.css" />
+		<link rel="stylesheet" type="text/css" href="libraries/jquery-ui-1.12.1.min.css" />
+		<script src="libraries/jquery-3.5.1.min.js" type="text/javascript"></script>
+		<script src="libraries/jquery-ui-1.12.1.min.js" type="text/javascript"></script>
+		<script src="js/popup.js" type="text/javascript"></script>
+	</head>
+
+	<body>
+		<template id="server-template">
+			<div class="server">
+				<div class="favourite-icon"></div>
+				<div class="name"><span></span></div>
+				<div class="verified-icon"></div>
+				<div class="ping-icon"></div>
+				<div class="players-icon"></div>
+				<div class="gamemode-icon"></div>
+				<div class="password-icon"></div>
+			</div>
+		</template>
+
+		<main class="container">
+			<section id="server-list" class="indented">
+				<div id="server-grid"></div>
+			</section>
+
+			<section id="server-info-grid" class="container">
+				<p id="gamemode"></p>
+				<div id="minimap" class="indented">
+					<img />
+				</div>
+				<div id="info">
+					<p id="key-info"></p>
+					<p id="state"></p>
+					<p id="description"></p>
+					<p id="players"></p>
+				</div>
+			</section>
+
+			<section id="extension-info-grid" class="container">
+				<header>
+					<a id="extension-name" href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">KAG Server Browser</a>
+					<div id="count">Loading servers...</div>
+				</header>
+				<div id="content">
+					<span style="color: rgb(254, 238, 115);">YELLOW</span> = official server<br />
+					<span style="color: rgb(254, 255, 254);">WHITE</span> = vanilla server<br />
+					<span style="color: rgb(175, 251, 254);">BLUE</span> = modded server<br />
+					<br />
+					Instant Search: Filter the server list down to those containing the search terms (case-insensitive). <br />
+					<br />
+					e.g. entering 'epsilon' will find any servers that epsilon is playing on or have 'epsilon' in the name.<br />
+					<br />
+					Players (%) slider: Use this to set the min and max percent full you want servers to be.<br />
+					<br />
+					e.g. set it to 1% min and 99% max to find servers that are not empty and not full, or set it to 50% to 99% to find servers that are 'at least half full'.
+				</div>
+				<footer>Made by <a id="creator" href="https://forum.thd.vg/members/16800/" target="_blank">epsilon</a> | Let's revive KAG!</footer>
+			</section>
+
+			<section id="search-grid">
+				<input type="text" placeholder="Instant Search..." spellcheck="false" autocomplete="off" id="search" class="indented" />
+				<select id="sort" class="indented">
+					<option value="count">Player Count</option>
+					<option value="percentage">Player Percentage</option>
+					<option value="gamemode">Gamemode</option>
+					<option value="size">Map Size</option>
+					<option value="name">Server Name</option>
+					<option value="country">Server Country</option>
+					<option value="favourites">Favourites Only</option>
+					<option value="officials">Officials Only</option>
+				</select>
+			</section>
+
+			<section id="filter-grid" class="container">
+				<div id="players-grid">
+					<span id="min-players"></span>
+					<span id="players-text">Players (%)</span>
+					<span id="max-players"></span>
+					<div id="slider"></div>
+				</div>
+				<select id="gamemodes" class="indented">
+					<option value="All">All Gamemodes</option>
+					<option value="Challenge">Challenge</option>
+					<option value="CTF">CTF</option>
+					<option value="Team Deathmatch">Team Deathmatch</option>
+					<option value="TTH">TTH</option>
+					<option value="Sandbox">Sandbox</option>
+				</select>
+				<div id="modded" class="button" value="0">Modded</div>
+				<div id="password" class="button" value="0">Password</div>
+				<div id="reload" class="button"></div>
+			</section>
+
+			<div id="play" class="button disabled">Play</div>
+		</main>
+	</body>
+</html>
