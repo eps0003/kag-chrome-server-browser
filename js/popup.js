@@ -10,11 +10,11 @@ $(function () {
 		},
 		change: function (e, ui) {
 			updateSliderLabels(ui.values);
-			updateServers();
+			filterServers();
 		},
 		slide: function (e, ui) {
 			updateSliderLabels(ui.values);
-			updateServers();
+			filterServers();
 		},
 	});
 
@@ -35,21 +35,22 @@ $(function () {
 	});
 
 	$("#sort, #gamemodes").change(function () {
-		updateServers();
+		filterServers();
+		sortServers();
 	});
 
 	$("#modded").click(function () {
 		const val = $("#modded").attr("value");
 		$("#modded").attr("value", (val + 1) % 3);
 
-		updateServers();
+		filterServers();
 	});
 
 	$("#password").click(function () {
 		const val = $("#password").attr("value");
 		$("#password").attr("value", (val + 1) % 3);
 
-		updateServers();
+		filterServers();
 	});
 
 	getServers();
@@ -92,38 +93,7 @@ function getServers() {
 function updateServers() {
 	$("#server-grid").empty();
 
-	//add gamemodes to dropdown
-	const gamemodesVal = $("#gamemodes").val();
-	$("#gamemodes option").slice(1).remove();
-	servers
-		.map((server) => server.gameMode)
-		.filter((x, i, a) => a.indexOf(x) === i)
-		.sort()
-		.forEach((gamemode) =>
-			$("#gamemodes").append(
-				$("<option>", {
-					value: gamemode,
-					text: gamemode,
-				})
-			)
-		);
-	$("#gamemodes").val(gamemodesVal);
-
-	//filter servers
-	let filteredServers = servers;
-	filteredServers = filterOutdatedServers(filteredServers);
-	filteredServers = filterLockedServers(filteredServers);
-	filteredServers = filterModdedServers(filteredServers);
-	filteredServers = filterOfficialServers(filteredServers);
-	filteredServers = filterServerGamemode(filteredServers);
-	filteredServers = filterServerPlayerCount(filteredServers);
-
-	//update server and player count
-	const serverCount = filteredServers.length;
-	const playerCount = filteredServers.reduce((total, server) => (total += server.currentPlayers), 0);
-	$("#count").text(`${serverCount} ${plural(serverCount, "server")} with ${playerCount} ${plural(playerCount, "player")}`);
-
-	for (const server of filteredServers) {
+	for (const server of servers) {
 		//clone template elemement
 		const element = cloneTemplateElement("#server-template");
 
@@ -203,7 +173,25 @@ function updateServers() {
 		$("#server-grid").append(element);
 	}
 
+	filterServers();
 	sortServers();
+
+	//add gamemodes to dropdown
+	const gamemodesVal = $("#gamemodes").val();
+	$("#gamemodes option").slice(1).remove();
+	servers
+		.map((server) => server.gameMode)
+		.filter((x, i, a) => a.indexOf(x) === i)
+		.sort()
+		.forEach((gamemode) =>
+			$("#gamemodes").append(
+				$("<option>", {
+					value: gamemode,
+					text: gamemode,
+				})
+			)
+		);
+	$("#gamemodes").val(gamemodesVal);
 }
 
 function mode(arr) {
@@ -228,57 +216,80 @@ function getCurrentBuild() {
 	return mode(servers.map((server) => server.build));
 }
 
-function filterOutdatedServers(servers) {
-	return servers.filter((server) => !server.outdated);
+function filterServers() {
+	let serverCount = 0;
+	let playerCount = 0;
+
+	$(".server").each((i, element) => {
+		const index = $(element).data("server-index");
+		const server = servers[index];
+		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount].every((func) => func(server));
+
+		if (visible) {
+			$(element).show();
+
+			serverCount++;
+			playerCount += server.currentPlayers;
+		} else {
+			$(element).hide();
+		}
+	});
+
+	//update server and player count
+	$("#count").text(`${serverCount} ${plural(serverCount, "server")} with ${playerCount} ${plural(playerCount, "player")}`);
 }
 
-function filterLockedServers(servers) {
+function filterOutdatedServer(server) {
+	return !server.outdated;
+}
+
+function filterLockedServer(server) {
 	const val = $("#password").attr("value");
 
 	switch (Number(val)) {
 		case 1:
-			return servers.filter((server) => !server.password);
+			return !server.password;
 		case 2:
-			return servers.filter((server) => server.password);
+			return server.password;
 	}
 
-	return servers;
+	return true;
 }
 
-function filterModdedServers(servers) {
+function filterModdedServer(server) {
 	const val = $("#modded").attr("value");
 
 	switch (Number(val)) {
 		case 1:
-			return servers.filter((server) => !server.usingMods);
+			return !server.usingMods;
 		case 2:
-			return servers.filter((server) => server.usingMods);
+			return server.usingMods;
 	}
 
-	return servers;
+	return true;
 }
 
-function filterOfficialServers(servers) {
+function filterOfficialServer(server) {
 	const val = $("#sort").val();
 
 	if (val === "officials") {
-		return servers.filter((server) => server.official);
+		return server.official;
 	}
 
-	return servers;
+	return true;
 }
 
-function filterServerGamemode(servers) {
+function filterServerGamemode(server) {
 	const val = $("#gamemodes").val();
 
 	if (val === "All") {
-		return servers;
+		return true;
 	}
 
-	return servers.filter((server) => server.gameMode === val);
+	return server.gameMode === val;
 }
 
-function filterServerPlayerCount(servers) {
+function filterServerPlayerCount(server) {
 	const vals = $("#slider")
 		.slider("values")
 		.sort((a, b) => a - b);
@@ -287,7 +298,7 @@ function filterServerPlayerCount(servers) {
 		vals[1] = Infinity;
 	}
 
-	return servers.filter((server) => server.playerPercentage >= vals[0] * 0.01 && server.playerPercentage <= vals[1] * 0.01);
+	return server.playerPercentage >= vals[0] * 0.01 && server.playerPercentage <= vals[1] * 0.01;
 }
 
 function cloneTemplateElement(id) {
@@ -319,7 +330,7 @@ function sortServers() {
 	const val = $("#sort").val();
 
 	$(".server")
-		.sort(function (a, b) {
+		.sort((a, b) => {
 			const indexA = $(a).data("server-index");
 			const indexB = $(b).data("server-index");
 
