@@ -11,7 +11,7 @@
 		<template id="server-template">
 			<div class="server">
 				<div class="favourite-icon"></div>
-				<span class="name"></span>
+				<div class="name"><span></span></div>
 				<div class="verified-icon"></div>
 				<div class="ping-icon"></div>
 				<div class="players-icon"></div>
@@ -41,7 +41,7 @@
 			<section id="extension-info-grid" class="container">
 				<header>
 					<a id="extension-name" href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">KAG Server Browser</a>
-					<div id="count">Loading servers...</div>
+					<div id="count"></div>
 				</header>
 				<div id="content">
 					<span style="color: rgb(254, 238, 115);">YELLOW</span> = official server<br />
@@ -67,7 +67,6 @@
 					<option value="gamemode">Gamemode</option>
 					<option value="size">Map Size</option>
 					<option value="name">Server Name</option>
-					<option value="country">Server Country</option>
 					<option value="favourites">Favourites Only</option>
 					<option value="officials">Officials Only</option>
 				</select>
@@ -82,11 +81,6 @@
 				</div>
 				<select id="gamemodes" class="indented">
 					<option value="All">All Gamemodes</option>
-					<option value="Challenge">Challenge</option>
-					<option value="CTF">CTF</option>
-					<option value="Team Deathmatch">Team Deathmatch</option>
-					<option value="TTH">TTH</option>
-					<option value="Sandbox">Sandbox</option>
 				</select>
 				<div id="modded" class="button" value="0">Modded</div>
 				<div id="password" class="button" value="0">Password</div>

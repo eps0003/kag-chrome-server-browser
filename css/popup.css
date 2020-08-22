@@ -97,6 +97,7 @@ select {
 	padding: 0px 24px 0px 8px;
 	text-align-last: center;
 	cursor: pointer;
+	width: 100%;
 }
 
 input[type="text"],
@@ -183,6 +184,7 @@ a:hover {
 }
 
 .server .name {
+	width: 100%;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -227,7 +229,6 @@ a:hover {
 	background-image: url(../images/server_not_favourite.png);
 	cursor: pointer;
 	align-self: center;
-	margin-right: 10px;
 }
 
 .favourite .favourite-icon {
@@ -235,7 +236,7 @@ a:hover {
 }
 
 .server .name {
-	padding-right: 10px;
+	padding: 0px 10px;
 }
 
 /* SERVER INFO GRID */
