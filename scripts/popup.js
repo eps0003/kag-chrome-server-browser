@@ -1,6 +1,7 @@
 let servers = [];
 let settings = {};
 let canReload = true;
+let selectedServer;
 
 const REGEX_WEBSITE = /\b((?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?)\b/gi;
 const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
@@ -86,6 +87,8 @@ function updateSliderLabels(values) {
 function getServers() {
 	canReload = false;
 
+	selectedServer = $(".server.selected").attr("data-address");
+
 	$("#server-grid").empty();
 	$("#count").text("Loading servers...");
 
@@ -100,6 +103,8 @@ function getServers() {
 			server.address = `${server.IPv4Address}:${server.port}`;
 			server.official = server.name.match(/(?=^KAG Official( Small)? \w+ (AUS?|EU|USA?)\b)|(?=^Official Modded Server (AUS?|EU|USA?)\b)/g);
 		}
+
+		updateServers();
 	})
 		.fail(function () {
 			servers = [];
@@ -107,7 +112,6 @@ function getServers() {
 		})
 		.always(function () {
 			canReload = true;
-			updateServers();
 		});
 }
 
@@ -119,6 +123,11 @@ function updateServers() {
 		const element = cloneTemplateElement("#server-template");
 
 		element.attr("data-address", server.address);
+
+		//select
+		if (selectedServer === server.address) {
+			selectServer(element);
+		}
 
 		//name
 		const nameSpan = element.find(".name span");
