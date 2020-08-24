@@ -1,6 +1,9 @@
 var servers = [];
 var canReload = true;
 
+const REGEX_WEBSITE = /\b((?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?)\b/gi;
+const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
+
 $(function () {
 	$("#slider").slider({
 		range: true,
@@ -31,7 +34,8 @@ $(function () {
 	});
 
 	$("#play").click(function () {
-		getSelectedServer();
+		if ($(this).hasClass("disabled")) return;
+		joinServer();
 	});
 
 	$("#sort, #gamemodes").change(function () {
@@ -74,7 +78,6 @@ function getServers() {
 		for (const i in data.serverList) {
 			const server = data.serverList[i];
 
-			server.index = i;
 			server.outdated = server.build !== currentBuild;
 			server.address = `${server.IPv4Address}:${server.port}`;
 			server.official = server.name.match(/(?=^KAG Official( Small)? \w+ (AUS?|EU|USA?)\b)|(?=^Official Modded Server (AUS?|EU|USA?)\b)/g);
@@ -97,7 +100,7 @@ function updateServers() {
 		//clone template elemement
 		const element = cloneTemplateElement("#server-template");
 
-		element.attr("data-server-index", server.index);
+		element.data("address", server.address);
 
 		//name
 		const nameSpan = element.find(".name span");
@@ -192,6 +195,14 @@ function updateServers() {
 			)
 		);
 	$("#gamemodes").val(gamemodesVal);
+
+	$(".server").click(function () {
+		selectServer(this);
+	});
+
+	$(".server").dblclick(function () {
+		$("#play").click();
+	});
 }
 
 function mode(arr) {
@@ -221,8 +232,7 @@ function filterServers() {
 	let playerCount = 0;
 
 	$(".server").each((i, element) => {
-		const index = $(element).data("server-index");
-		const server = servers[index];
+		const server = getServerData(element);
 		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount].every((func) => func(server));
 
 		if (visible) {
@@ -309,17 +319,24 @@ function getSelectedServer() {
 	return $(".server.selected");
 }
 
-function joinServer(server) {
-	if (!server.outdated) {
-		window.open(`kag://${server.address}/`);
+function joinServer() {
+	const address = $("#play").data("address");
+	let url = `kag://${address}/`;
+
+	if ($(".server.selected").hasClass("locked")) {
+		const password = prompt("Enter server password");
+		if (!password) return;
+		url += password;
 	}
+
+	window.open(url);
 }
 
 function getServerData(element) {
 	if (!$(element).length) return;
 
-	const index = $(element).data("server-index");
-	return servers[index];
+	const address = $(element).data("address");
+	return servers.find((server) => server.address === address);
 }
 
 function plural(val, text, suffix = "s") {
@@ -331,11 +348,8 @@ function sortServers() {
 
 	$(".server")
 		.sort((a, b) => {
-			const indexA = $(a).data("server-index");
-			const indexB = $(b).data("server-index");
-
-			const serverA = servers[indexA];
-			const serverB = servers[indexB];
+			const serverA = getServerData(a);
+			const serverB = getServerData(b);
 
 			switch (val) {
 				case "percentage":
@@ -356,11 +370,11 @@ function sortServers() {
 function sortServerGamemode(a, b) {
 	if (a.gameMode === b.gameMode) {
 		if (a.name === b.name) {
-			return equalsCaseInsensitive(a.address, b.address);
+			return compareCaseInsensitive(a.address, b.address);
 		}
-		return equalsCaseInsensitive(a.name, b.name);
+		return compareCaseInsensitive(a.name, b.name);
 	}
-	return equalsCaseInsensitive(a.gameMode, b.gameMode);
+	return compareCaseInsensitive(a.gameMode, b.gameMode);
 }
 
 function sortServerMapSize(a, b) {
@@ -369,26 +383,26 @@ function sortServerMapSize(a, b) {
 
 	if (mapSizeA === mapSizeB) {
 		if (a.name === b.name) {
-			return equalsCaseInsensitive(a.address, b.address);
+			return compareCaseInsensitive(a.address, b.address);
 		}
-		return equalsCaseInsensitive(a.name, b.name);
+		return compareCaseInsensitive(a.name, b.name);
 	}
 	return mapSizeB - mapSizeA;
 }
 
 function sortServerName(a, b) {
 	if (a.name === b.name) {
-		return equalsCaseInsensitive(a.address, b.address);
+		return compareCaseInsensitive(a.address, b.address);
 	}
-	return equalsCaseInsensitive(a.name, b.name);
+	return compareCaseInsensitive(a.name, b.name);
 }
 
 function sortServerPlayerPercentage(a, b) {
 	if (a.playerPercentage === b.playerPercentage) {
 		if (a.name === b.name) {
-			return equalsCaseInsensitive(a.address, b.address);
+			return compareCaseInsensitive(a.address, b.address);
 		}
-		return equalsCaseInsensitive(a.name, b.name);
+		return compareCaseInsensitive(a.name, b.name);
 	}
 	return b.playerPercentage - a.playerPercentage;
 }
@@ -396,13 +410,105 @@ function sortServerPlayerPercentage(a, b) {
 function sortServerPlayerCount(a, b) {
 	if (a.currentPlayers === b.currentPlayers) {
 		if (a.name === b.name) {
-			return equalsCaseInsensitive(a.address, b.address);
+			return compareCaseInsensitive(a.address, b.address);
 		}
-		return equalsCaseInsensitive(a.name, b.name);
+		return compareCaseInsensitive(a.name, b.name);
 	}
 	return b.currentPlayers - a.currentPlayers;
 }
 
-function equalsCaseInsensitive(a, b) {
+function compareCaseInsensitive(a, b) {
 	return a.localeCompare(b, undefined, { sensitivity: "base" });
+}
+
+function selectServer(element) {
+	if (!$(element).length || isServerSelected(element)) return;
+
+	//select server
+	$(".server").removeClass("selected");
+	$(element).addClass("selected");
+
+	updateServerInfo();
+
+	//hide extension info
+	$("#extension-info-grid").hide();
+
+	//enable play button
+	if (!$(element).hasClass("outdated")) {
+		$("#play").removeClass("disabled");
+		$("#play").data("address", $(element).data("address"));
+	} else {
+		$("#play").addClass("disabled");
+		$("#play").removeData("address");
+	}
+}
+
+function isServerSelected(element) {
+	return $(element).hasClass("selected");
+}
+
+function updateServerInfo() {
+	const server = getServerData(getSelectedServer());
+	if (!server) return;
+
+	//player count
+	let players = `${server.currentPlayers} / ${server.maxPlayers}`;
+	if (server.currentPlayers >= server.maxPlayers) players += " (FULL)";
+
+	//reserved slots
+	const reservedSlots = server.reservedPlayers ? `${Math.max(0, server.currentPlayers - server.maxPlayers)} / ${server.reservedPlayers}` : "(NONE)";
+
+	//game state
+	const gameState = server.gameState ? "GAME IN PROGRESS" : "BUILDING TIME";
+
+	//spectators
+	const spectators = server.spectatorPlayers ? `Spectators: ${server.spectatorPlayers}\n` : "";
+
+	//description
+	const description = server.description.trim().replace(REGEX_WEBSITE, `<a href="$1" target="_blank">$1</a>`).replace(REGEX_EMAIL, `<a href="mailto:$1" target="_blank">$1</a>`);
+
+	//player list
+	const playerList = server.playerList.length ? `Players: ${server.playerList.sort((a, b) => compareCaseInsensitive(a, b)).join(", ")}` : "";
+
+	//add to panel
+	$("#gamemode span").text(server.gameMode);
+	$("#gamemode span").attr("title", server.gameMode);
+
+	$("#key-info").html(`Players: ${players}<br />Reserved Slots: ${reservedSlots}<br />Map Size: ${server.mapW} x ${server.mapH}<br />${spectators}`);
+	$("#game-state").text(gameState);
+	$("#description").html(description);
+	$("#players").text(playerList);
+
+	getMinimap(server, function (img) {
+		if ($(img).data("address") !== $(".server.selected").data("address")) return;
+		$("#minimap img").replaceWith(img);
+
+		let divW = $("#minimap").width();
+		let divH = $("#minimap").height();
+		let imgW = $(img).width();
+		let imgH = $(img).height();
+
+		//scroll or move minimap to center depending on size compared to container
+		$("#minimap").scrollLeft((imgW - divW) / 2);
+		$("#minimap").scrollTop((imgH - divH) / 2);
+		if (divW > imgW) $(img).css("left", (divW - imgW) / 2);
+		if (divH > imgH) $(img).css("top", (divH - imgH) / 2);
+	});
+}
+
+function getMinimap(server, callback) {
+	let img = new Image();
+	$(img).data("address", server.address);
+	$(img).attr("src", getMinimapURL(server));
+	img.onload = function () {
+		callback(this);
+	};
+	img.onerror = function () {
+		img.src = "";
+		callback(this);
+	};
+}
+
+function getMinimapURL(server) {
+	return `https://api.kag2d.com/v1/game/thd/kag/server/${server.IPv4Address}/${server.port}/minimap?${new Date().valueOf()}`;
 }

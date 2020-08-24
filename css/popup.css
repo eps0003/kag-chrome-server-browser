@@ -22,11 +22,13 @@
 	--outer-border-color: rgb(66, 72, 75);
 	--inner-border-color: rgb(151, 167, 146);
 	--button-outer-border-color: rgb(19, 13, 29);
+	--minimap-middle-border-color: rgb(159, 97, 37);
 	--box-shadow: inset 0 0 0 2px var(--outer-border-color), inset 0 0 0 4px var(--inner-border-color);
 	--indented-box-shadow: var(--box-shadow), inset 0 0 0 6px var(--outer-border-color);
 	--button-box-shadow: inset 0 0 0 2px var(--button-outer-border-color), inset 0 0 0 4px var(--background-color);
 	--modded-server-box-shadow: inset 0 0 0 2px rgb(54, 65, 75), inset 0 0 0 4px rgb(124, 151, 146);
 	--official-server-box-shadow: inset 0 0 0 2px rgb(66, 72, 62), inset 0 0 0 4px rgb(151, 167, 120);
+	--minimap-box-shadow: 0 0 0 2px var(--button-outer-border-color), 0 0 0 4px var(--minimap-middle-border-color), 0 0 0 6px var(--button-outer-border-color);
 
 	--filter-grid-height: 100px;
 }
@@ -263,6 +265,9 @@ a:hover {
 
 #minimap {
 	grid-area: minimap;
+	overflow: hidden;
+	margin: 6px;
+	box-shadow: var(--minimap-box-shadow);
 	cursor: -webkit-grab;
 	cursor: grab;
 }
@@ -285,6 +290,20 @@ a:hover {
 
 #info::-webkit-scrollbar {
 	width: 0px;
+}
+
+#info * {
+	margin-top: 0;
+}
+
+#info *:last-child {
+	margin-bottom: 0;
+}
+
+#description,
+#players {
+	font-size: 11px;
+	font-weight: normal;
 }
 
 /* EXTENSION INFO GRID */
