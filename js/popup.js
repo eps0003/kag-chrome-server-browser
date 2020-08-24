@@ -70,6 +70,10 @@ $(function () {
 			filterServers();
 		});
 
+		$("#search").on("input", function () {
+			filterServers();
+		});
+
 		getServers();
 	});
 });
@@ -266,7 +270,7 @@ function filterServers() {
 
 	$(".server").each((i, element) => {
 		const server = getServerData(element);
-		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount, filterFavoriteServer].every((func) => func(element, server));
+		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount, filterFavoriteServer, filterServerSearch].every((func) => func(element, server));
 
 		if (visible) {
 			$(element).show();
@@ -353,6 +357,28 @@ function filterFavoriteServer(element, server) {
 	}
 
 	return true;
+}
+
+function filterServerSearch(element, server) {
+	let words = $("#search").val().toUpperCase().split(/ +/).filter(Boolean);
+	return words.every((word) => {
+		let orCheck = word.split(/\/+/).filter(Boolean);
+		return orCheck.some(
+			(word) =>
+				//server name
+				server.name.toUpperCase().includes(word) ||
+				//player name
+				server.playerList.some((player) => player.toUpperCase().includes(word)) ||
+				//server gamemode
+				server.gameMode.toUpperCase().includes(word) ||
+				//allow tdm acronym
+				(server.gameMode === "Team Deathmatch" && "TDM".includes(word)) ||
+				//ip address
+				(word.match(/[:\.]/) && server.address.includes(word)) ||
+				//server description
+				server.description.toUpperCase().includes(word)
+		);
+	});
 }
 
 function cloneTemplateElement(id) {
