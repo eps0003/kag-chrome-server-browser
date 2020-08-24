@@ -293,11 +293,12 @@ a:hover {
 }
 
 #info * {
-	margin-top: 0;
+	margin-bottom: 0;
 }
 
-#info *:last-child {
-	margin-bottom: 0;
+#info *:first-child,
+#info *:empty {
+	margin-top: 0;
 }
 
 #description,
