@@ -1,6 +1,6 @@
-var servers = [];
-var settings = {};
-var canReload = true;
+let servers = [];
+let settings = {};
+let canReload = true;
 
 const REGEX_WEBSITE = /\b((?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?)\b/gi;
 const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
@@ -60,11 +60,11 @@ $(function () {
 		});
 
 		$(".toggle").click(function () {
-			const currentVal = $(this).attr("value");
+			const currentVal = $(this).attr("data-value");
 			const val = (currentVal + 1) % 3;
 			const id = $(this).attr("id");
 
-			$(this).attr("value", val);
+			$(this).attr("data-value", val);
 			chrome.storage.sync.set({ [id]: val });
 
 			filterServers();
@@ -149,6 +149,11 @@ function updateServers() {
 			passwordIcon.attr("title", "Locked");
 		}
 
+		//favorite
+		if (settings.favorites && settings.favorites.some((fav) => fav === server.address)) {
+			$(element).addClass("favorite");
+		}
+
 		//gamemode
 		const gamemodeIcon = element.find(".gamemode-icon");
 
@@ -194,35 +199,10 @@ function updateServers() {
 		$("#server-grid").append(element);
 	}
 
-	//favorite servers
-	if (settings.favorites) {
-		for (const fav of settings.favorites) {
-			const element = getServer(fav);
-			if (element) {
-				$(element).addClass("favorite");
-			}
-		}
-	}
-
 	filterServers();
 	sortServers();
 
-	//add gamemodes to dropdown
-	const gamemodesVal = $("#gamemodes").val();
-	$("#gamemodes option").slice(1).remove();
-	servers
-		.map((server) => server.gameMode)
-		.filter((x, i, a) => a.indexOf(x) === i)
-		.sort()
-		.forEach((gamemode) =>
-			$("#gamemodes").append(
-				$("<option>", {
-					value: gamemode,
-					text: gamemode,
-				})
-			)
-		);
-	$("#gamemodes").val(gamemodesVal);
+	addGamemodesToDropdown();
 
 	$(".server").click(function () {
 		selectServer(this);
@@ -240,6 +220,31 @@ function updateServers() {
 	$(".server .favorite-icon").dblclick(function () {
 		event.stopPropagation();
 	});
+}
+
+function addGamemodesToDropdown() {
+	//remember selected gamemode
+	const gamemodesVal = $("#gamemodes").val();
+
+	//remove all gamemodes
+	$("#gamemodes option").slice(1).remove();
+
+	//add gamemodes
+	servers
+		.map((server) => server.gameMode)
+		.filter((x, i, a) => a.indexOf(x) === i)
+		.sort()
+		.forEach((gamemode) =>
+			$("#gamemodes").append(
+				$("<option>", {
+					value: gamemode,
+					text: gamemode,
+				})
+			)
+		);
+
+	//reselect selected gamemode
+	$("#gamemodes").val(gamemodesVal);
 }
 
 function mode(arr) {
@@ -291,7 +296,7 @@ function filterOutdatedServer(element, server) {
 }
 
 function filterLockedServer(element, server) {
-	const val = $("#password").attr("value");
+	const val = $("#password").attr("data-value");
 
 	switch (Number(val)) {
 		case 1:
@@ -304,7 +309,7 @@ function filterLockedServer(element, server) {
 }
 
 function filterModdedServer(element, server) {
-	const val = $("#modded").attr("value");
+	const val = $("#modded").attr("data-value");
 
 	switch (Number(val)) {
 		case 1:
@@ -317,7 +322,7 @@ function filterModdedServer(element, server) {
 }
 
 function filterOfficialServer(element, server) {
-	const val = $("#officials").attr("value");
+	const val = $("#officials").attr("data-value");
 
 	switch (Number(val)) {
 		case 1:
@@ -347,7 +352,7 @@ function filterServerPlayerCount(element, server) {
 }
 
 function filterFavoriteServer(element, server) {
-	const val = $("#favorites").attr("value");
+	const val = $("#favorites").attr("data-value");
 
 	switch (Number(val)) {
 		case 1:
@@ -360,25 +365,28 @@ function filterFavoriteServer(element, server) {
 }
 
 function filterServerSearch(element, server) {
-	let words = $("#search").val().toUpperCase().split(/ +/).filter(Boolean);
-	return words.every((word) => {
-		let orCheck = word.split(/\/+/).filter(Boolean);
-		return orCheck.some(
-			(word) =>
-				//server name
-				server.name.toUpperCase().includes(word) ||
-				//player name
-				server.playerList.some((player) => player.toUpperCase().includes(word)) ||
-				//server gamemode
-				server.gameMode.toUpperCase().includes(word) ||
-				//allow tdm acronym
-				(server.gameMode === "Team Deathmatch" && "TDM".includes(word)) ||
-				//ip address
-				(word.match(/[:\.]/) && server.address.includes(word)) ||
-				//server description
-				server.description.toUpperCase().includes(word)
-		);
+	const andCheck = $("#search").val().toUpperCase().split(/ +/).filter(Boolean);
+	return andCheck.every((word) => {
+		const orCheck = word.split(/\/+/).filter(Boolean);
+		return orCheck.some((word) => foundSearchTerm(word, server));
 	});
+}
+
+function foundSearchTerm(word, server) {
+	return (
+		//server name
+		server.name.toUpperCase().includes(word) ||
+		//player name
+		server.playerList.some((player) => player.toUpperCase().includes(word)) ||
+		//server gamemode
+		server.gameMode.toUpperCase().includes(word) ||
+		//allow tdm acronym
+		(server.gameMode === "Team Deathmatch" && "TDM".includes(word)) ||
+		//ip address
+		(word.match(/[:\.]/) && server.address.includes(word)) ||
+		//server description
+		server.description.toUpperCase().includes(word)
+	);
 }
 
 function cloneTemplateElement(id) {
@@ -409,12 +417,8 @@ function getServerData(element) {
 	return servers.find((server) => server.address === address);
 }
 
-function getServer(address) {
-	return $(`.server[data-address="${address}"]`);
-}
-
 function plural(val, text, suffix = "s") {
-	return val == 1 ? text : text + suffix;
+	return Number(val) === 1 ? text : text + suffix;
 }
 
 function sortServers() {
@@ -553,6 +557,7 @@ function updateServerInfo() {
 	$("#description").html(description);
 	$("#players").text(playerList);
 
+	//minimap
 	getMinimap(server, function (img) {
 		if ($(img).data("address") !== $(".server.selected").data("address")) return;
 		$("#minimap img").replaceWith(img);
@@ -622,23 +627,23 @@ function isFavoriteServer(element) {
 
 function setDefaults() {
 	if (settings.sort) {
-		$("#sort").val(settings.sort);
+		$("#sort").attr("data-value", settings.sort);
 	}
 
 	if (settings.modded) {
-		$("#modded").attr("value", settings.modded);
+		$("#modded").attr("data-value", settings.modded);
 	}
 
 	if (settings.password) {
-		$("#password").attr("value", settings.password);
+		$("#password").attr("data-value", settings.password);
 	}
 
 	if (settings.officials) {
-		$("#officials").attr("value", settings.officials);
+		$("#officials").attr("data-value", settings.officials);
 	}
 
 	if (settings.favorites) {
-		$("#favorites").attr("value", settings.favorites);
+		$("#favorites").attr("data-value", settings.favorites);
 	}
 
 	if (settings.sliderValues) {

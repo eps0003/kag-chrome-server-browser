@@ -407,7 +407,7 @@ a:hover {
 
 #slider {
 	position: absolute;
-	bottom: 3;
+	bottom: 3px;
 	width: calc(100% - 12px);
 	height: 10px;
 	background-color: var(--background-color);
@@ -445,11 +445,11 @@ a:hover {
 	padding-right: 20px;
 }
 
-.toggle[value="1"] {
+.toggle[data-value="1"] {
 	background-image: url(../images/button_cross.png);
 }
 
-.toggle[value="2"] {
+.toggle[data-value="2"] {
 	background-image: url(../images/button_tick.png);
 }
 
