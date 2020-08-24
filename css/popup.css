@@ -96,7 +96,7 @@ select {
 	background-image: url(../images/arrow_down.png);
 	background-repeat: no-repeat;
 	background-position: calc(100% - 16px);
-	padding: 0px 24px 0px 8px;
+	padding: 0px 26px 0px 8px;
 	text-align-last: center;
 	cursor: pointer;
 	width: 100%;
@@ -178,7 +178,7 @@ a:hover {
 .server {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
-	grid-template-areas: "favourite name verified ping players gamemode password";
+	grid-template-areas: "favorite name verified ping players gamemode password";
 	padding: 14px;
 	background-color: var(--background-color);
 	box-shadow: var(--box-shadow);
@@ -227,14 +227,14 @@ a:hover {
 	height: 16px;
 }
 
-.favourite-icon {
-	background-image: url(../images/server_not_favourite.png);
+.favorite-icon {
+	background-image: url(../images/server_not_favorite.png);
 	cursor: pointer;
 	align-self: center;
 }
 
-.favourite .favourite-icon {
-	background-image: url(../images/server_favourite.png);
+.favorite .favorite-icon {
+	background-image: url(../images/server_favorite.png);
 }
 
 .server .name {
@@ -367,19 +367,18 @@ a:hover {
 #filter-grid {
 	grid-area: filters;
 	display: grid;
-	grid-template-columns: 1fr 1fr calc(var(--filter-grid-height) - 12px);
+	grid-template-columns: 4fr 3fr 3fr calc(var(--filter-grid-height) - 12px);
 	grid-template-rows: 1fr 1fr;
 	grid-template-areas:
-		"players modded reload"
-		"gamemodes password reload";
+		"players modded officials reload"
+		"gamemodes password favorites reload";
 	grid-gap: 8px;
 	padding: 12px;
 }
 
 #players-grid {
-	grid-area: players;
 	display: grid;
-	grid-template-columns: 1fr 2fr 1fr;
+	grid-template-columns: 40px 1fr 40px;
 	grid-template-rows: 1fr 1fr;
 	grid-template-areas:
 		"min text max"
@@ -404,7 +403,6 @@ a:hover {
 }
 
 #slider {
-	grid-area: slider;
 	position: absolute;
 	bottom: 3;
 	width: calc(100% - 12px);
@@ -437,34 +435,18 @@ a:hover {
 	margin-top: -3px;
 }
 
-#gamemodes {
-	grid-area: gamemodes;
-}
-
-#modded {
-	grid-area: modded;
-}
-
-#password {
-	grid-area: password;
-}
-
-#modded,
-#password {
+.toggle {
 	background-image: url(../images/button_unchecked.png);
 	background-repeat: no-repeat;
 	background-position: calc(50% + 38px);
-	justify-content: left;
-	padding-left: calc(50% - 46px);
+	padding-right: 20px;
 }
 
-#modded[value="1"],
-#password[value="1"] {
+.toggle[value="1"] {
 	background-image: url(../images/button_cross.png);
 }
 
-#modded[value="2"],
-#password[value="2"] {
+.toggle[value="2"] {
 	background-image: url(../images/button_tick.png);
 }
 

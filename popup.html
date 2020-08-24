@@ -11,7 +11,7 @@
 	<body>
 		<template id="server-template">
 			<div class="server">
-				<div class="favourite-icon"></div>
+				<div class="favorite-icon"></div>
 				<div class="name"><span></span></div>
 				<div class="verified-icon"></div>
 				<div class="ping-icon"></div>
@@ -42,7 +42,7 @@
 			<section id="extension-info-grid" class="container">
 				<header>
 					<a id="extension-name" href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">KAG Server Browser</a>
-					<div id="count"></div>
+					<div id="count">Loading servers...</div>
 				</header>
 				<div id="content">
 					<span style="color: rgb(254, 238, 115);">YELLOW</span> = official server<br />
@@ -68,23 +68,23 @@
 					<option value="gamemode">Gamemode</option>
 					<option value="size">Map Size</option>
 					<option value="name">Server Name</option>
-					<option value="favourites">Favourites Only</option>
-					<option value="officials">Officials Only</option>
 				</select>
 			</section>
 
 			<section id="filter-grid" class="container">
 				<div id="players-grid">
 					<span id="min-players"></span>
-					<span id="players-text">Players (%)</span>
+					<span id="players-text">Players</span>
 					<span id="max-players"></span>
 					<div id="slider"></div>
 				</div>
+				<div id="modded" class="button toggle" value="0">Modded</div>
+				<div id="officials" class="button toggle" value="0">Officials</div>
 				<select id="gamemodes" class="indented">
 					<option value="All">All Gamemodes</option>
 				</select>
-				<div id="modded" class="button" value="0">Modded</div>
-				<div id="password" class="button" value="0">Password</div>
+				<div id="password" class="button toggle" value="0">Password</div>
+				<div id="favorites" class="button toggle" value="0">Favorites</div>
 				<div id="reload" class="button"></div>
 			</section>
 

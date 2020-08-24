@@ -1,63 +1,77 @@
 var servers = [];
+var settings = {};
 var canReload = true;
 
 const REGEX_WEBSITE = /\b((?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?)\b/gi;
 const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
 
 $(function () {
-	$("#slider").slider({
-		range: true,
-		values: [0, 100],
-		create: function (e, ui) {
-			updateSliderLabels([0, 100]);
-		},
-		change: function (e, ui) {
-			updateSliderLabels(ui.values);
+	chrome.storage.sync.get(null, function (data) {
+		settings = data;
+		console.log(settings);
+
+		setDefaults();
+
+		$("#slider").slider({
+			range: true,
+			values: settings.sliderValues || [0, 100],
+			create: function (e, ui) {
+				updateSliderLabels(settings.sliderValues || [0, 100]);
+			},
+			change: function (e, ui) {
+				updateSliderLabels(ui.values);
+				filterServers();
+			},
+			slide: function (e, ui) {
+				updateSliderLabels(ui.values);
+
+				//manually set values so it doesnt use the previous values when filtering players
+				$("#slider").slider("values", ui.values);
+
+				filterServers();
+			},
+			stop: function (e, ui) {
+				chrome.storage.sync.set({ sliderValues: ui.values });
+			},
+		});
+
+		$(".button").click(function () {
+			if ($(this).hasClass("disabled")) return;
+
+			const audio = new Audio("audio/menuclick.ogg");
+			audio.currentTime = 0;
+			audio.play();
+		});
+
+		$("#reload").click(function () {
+			getServers();
+		});
+
+		$("#play").click(function () {
+			if ($(this).hasClass("disabled")) return;
+			joinServer();
+		});
+
+		$("#sort, #gamemodes").change(function () {
+			chrome.storage.sync.set({ sort: $("#sort").val() });
+
 			filterServers();
-		},
-		slide: function (e, ui) {
-			updateSliderLabels(ui.values);
+			sortServers();
+		});
+
+		$(".toggle").click(function () {
+			const currentVal = $(this).attr("value");
+			const val = (currentVal + 1) % 3;
+			const id = $(this).attr("id");
+
+			$(this).attr("value", val);
+			chrome.storage.sync.set({ [id]: val });
+
 			filterServers();
-		},
-	});
+		});
 
-	$(".button").click(function () {
-		if ($(this).hasClass("disabled")) return;
-
-		const audio = new Audio("audio/menuclick.ogg");
-		audio.currentTime = 0;
-		audio.play();
-	});
-
-	$("#reload").click(function () {
 		getServers();
 	});
-
-	$("#play").click(function () {
-		if ($(this).hasClass("disabled")) return;
-		joinServer();
-	});
-
-	$("#sort, #gamemodes").change(function () {
-		filterServers();
-		sortServers();
-	});
-
-	$("#modded").click(function () {
-		const val = $("#modded").attr("value");
-		$("#modded").attr("value", (val + 1) % 3);
-
-		filterServers();
-	});
-
-	$("#password").click(function () {
-		const val = $("#password").attr("value");
-		$("#password").attr("value", (val + 1) % 3);
-
-		filterServers();
-	});
-
-	getServers();
 });
 
 function updateSliderLabels(values) {
@@ -97,10 +111,10 @@ function updateServers() {
 	$("#server-grid").empty();
 
 	for (const server of servers) {
-		//clone template elemement
+		//clone template element
 		const element = cloneTemplateElement("#server-template");
 
-		element.data("address", server.address);
+		element.attr("data-address", server.address);
 
 		//name
 		const nameSpan = element.find(".name span");
@@ -176,6 +190,16 @@ function updateServers() {
 		$("#server-grid").append(element);
 	}
 
+	//favorite servers
+	if (settings.favorites) {
+		for (const fav of settings.favorites) {
+			const element = getServer(fav);
+			if (element) {
+				$(element).addClass("favorite");
+			}
+		}
+	}
+
 	filterServers();
 	sortServers();
 
@@ -202,6 +226,15 @@ function updateServers() {
 
 	$(".server").dblclick(function () {
 		$("#play").click();
+	});
+
+	$(".server .favorite-icon").click(function () {
+		toggleFavoriteServer($(this).parent());
+		event.stopPropagation();
+	});
+
+	$(".server .favorite-icon").dblclick(function () {
+		event.stopPropagation();
 	});
 }
 
@@ -233,7 +266,7 @@ function filterServers() {
 
 	$(".server").each((i, element) => {
 		const server = getServerData(element);
-		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount].every((func) => func(server));
+		const visible = [filterOutdatedServer, filterLockedServer, filterModdedServer, filterOfficialServer, filterServerGamemode, filterServerPlayerCount, filterFavoriteServer].every((func) => func(element, server));
 
 		if (visible) {
 			$(element).show();
@@ -249,57 +282,55 @@ function filterServers() {
 	$("#count").text(`${serverCount} ${plural(serverCount, "server")} with ${playerCount} ${plural(playerCount, "player")}`);
 }
 
-function filterOutdatedServer(server) {
-	return !server.outdated;
+function filterOutdatedServer(element, server) {
+	return !$(element).hasClass("outdated");
 }
 
-function filterLockedServer(server) {
+function filterLockedServer(element, server) {
 	const val = $("#password").attr("value");
 
 	switch (Number(val)) {
 		case 1:
-			return !server.password;
+			return !$(element).hasClass("locked");
 		case 2:
-			return server.password;
+			return $(element).hasClass("locked");
 	}
 
 	return true;
 }
 
-function filterModdedServer(server) {
+function filterModdedServer(element, server) {
 	const val = $("#modded").attr("value");
 
 	switch (Number(val)) {
 		case 1:
-			return !server.usingMods;
+			return !$(element).hasClass("modded");
 		case 2:
-			return server.usingMods;
+			return $(element).hasClass("modded");
 	}
 
 	return true;
 }
 
-function filterOfficialServer(server) {
-	const val = $("#sort").val();
+function filterOfficialServer(element, server) {
+	const val = $("#officials").attr("value");
 
-	if (val === "officials") {
-		return server.official;
+	switch (Number(val)) {
+		case 1:
+			return !$(element).hasClass("official");
+		case 2:
+			return $(element).hasClass("official");
 	}
 
 	return true;
 }
 
-function filterServerGamemode(server) {
+function filterServerGamemode(element, server) {
 	const val = $("#gamemodes").val();
-
-	if (val === "All") {
-		return true;
-	}
-
-	return server.gameMode === val;
+	return val === "All" || server.gameMode === val;
 }
 
-function filterServerPlayerCount(server) {
+function filterServerPlayerCount(element, server) {
 	const vals = $("#slider")
 		.slider("values")
 		.sort((a, b) => a - b);
@@ -309,6 +340,19 @@ function filterServerPlayerCount(server) {
 	}
 
 	return server.playerPercentage >= vals[0] * 0.01 && server.playerPercentage <= vals[1] * 0.01;
+}
+
+function filterFavoriteServer(element, server) {
+	const val = $("#favorites").attr("value");
+
+	switch (Number(val)) {
+		case 1:
+			return !$(element).hasClass("favorite");
+		case 2:
+			return $(element).hasClass("favorite");
+	}
+
+	return true;
 }
 
 function cloneTemplateElement(id) {
@@ -337,6 +381,10 @@ function getServerData(element) {
 
 	const address = $(element).data("address");
 	return servers.find((server) => server.address === address);
+}
+
+function getServer(address) {
+	return $(`.server[data-address="${address}"]`);
 }
 
 function plural(val, text, suffix = "s") {
@@ -436,7 +484,7 @@ function selectServer(element) {
 	//enable play button
 	if (!$(element).hasClass("outdated")) {
 		$("#play").removeClass("disabled");
-		$("#play").data("address", $(element).data("address"));
+		$("#play").attr("data-address", $(element).data("address"));
 	} else {
 		$("#play").addClass("disabled");
 		$("#play").removeData("address");
@@ -498,7 +546,7 @@ function updateServerInfo() {
 
 function getMinimap(server, callback) {
 	let img = new Image();
-	$(img).data("address", server.address);
+	$(img).attr("data-address", server.address);
 	$(img).attr("src", getMinimapURL(server));
 	img.onload = function () {
 		callback(this);
@@ -511,4 +559,64 @@ function getMinimap(server, callback) {
 
 function getMinimapURL(server) {
 	return `https://api.kag2d.com/v1/game/thd/kag/server/${server.IPv4Address}/${server.port}/minimap?${new Date().valueOf()}`;
+}
+
+function toggleFavoriteServer(element) {
+	if (!$(element).length) return;
+
+	$(element).toggleClass("favorite");
+
+	const address = $(element).data("address");
+
+	if (isFavoriteServer(element)) {
+		if (!settings.favorites) {
+			settings.favorites = [];
+		}
+
+		//add to favorites
+		if (!settings.favorites.some((fav) => fav === address)) {
+			settings.favorites.push(address);
+		}
+	} else if (settings.favorites) {
+		//remove from favorites
+		const index = settings.favorites.findIndex((fav) => fav === address);
+		if (index > -1) {
+			settings.favorites.splice(index, 1);
+		}
+	}
+
+	chrome.storage.sync.set({ favorites: settings.favorites });
+
+	filterServers();
+}
+
+function isFavoriteServer(element) {
+	return $(element).hasClass("favorite");
+}
+
+function setDefaults() {
+	if (settings.sort) {
+		$("#sort").val(settings.sort);
+	}
+
+	if (settings.modded) {
+		$("#modded").attr("value", settings.modded);
+	}
+
+	if (settings.password) {
+		$("#password").attr("value", settings.password);
+	}
+
+	if (settings.officials) {
+		$("#officials").attr("value", settings.officials);
+	}
+
+	if (settings.favorites) {
+		$("#favorites").attr("value", settings.favorites);
+	}
+
+	if (settings.sliderValues) {
+		$("#min-players").text(Math.min(...settings.sliderValues) + "%");
+		$("#max-players").text(Math.max(...settings.sliderValues) + "%");
+	}
 }
