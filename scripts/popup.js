@@ -54,7 +54,7 @@ $(function () {
 		});
 
 		$("#sort, #gamemodes").change(function () {
-			chrome.storage.sync.set({ sort: $("#sort").val() });
+			chrome.storage.sync.set({ sortDropdown: $("#sort").val() });
 
 			filterServers();
 			sortServers();
@@ -66,13 +66,17 @@ $(function () {
 			const id = $(this).attr("id");
 
 			$(this).attr("data-value", val);
-			chrome.storage.sync.set({ [id]: val });
+			chrome.storage.sync.set({ [id + "Button"]: val });
 
 			filterServers();
 		});
 
 		$("#search").on("input", function () {
 			filterServers();
+		});
+
+		$("#players").on("click", ".player", function () {
+			toggleFriend(this);
 		});
 
 		getServers();
@@ -159,7 +163,7 @@ function updateServers() {
 		}
 
 		//favorite
-		if (settings.favorites && settings.favorites.some((fav) => fav === server.address)) {
+		if (isFavoriteServer(server.address)) {
 			$(element).addClass("favorite");
 		}
 
@@ -184,18 +188,7 @@ function updateServers() {
 			gamemodeIcon.css("background-image", "url(images/server_unknown.png)");
 		}
 
-		//players
-		const playersIcon = element.find(".players-icon");
-		if (server.playerPercentage >= 1) {
-			playersIcon.css("background-image", "url(images/server_full.png)");
-		} else if (server.playerPercentage > 0) {
-			const index = Math.min(3, Math.ceil(server.playerPercentage * 3));
-			playersIcon.css("background-image", `url(images/server_players_${index}.png)`);
-		}
-
-		if (server.currentPlayers > 0) {
-			playersIcon.attr("title", `${server.currentPlayers}/${server.maxPlayers}`);
-		}
+		updateServerPlayersIcon(element, server);
 
 		//verified
 		if (server.modsVerified) {
@@ -229,6 +222,28 @@ function updateServers() {
 	$(".server .favorite-icon").dblclick(function () {
 		event.stopPropagation();
 	});
+}
+
+function updateServerPlayersIcon(element, server) {
+	if (!$(element).length || !server) return;
+
+	//players
+	const friendsOnline = settings.friends ? settings.friends.filter((username) => server.playerList.includes(username)).length : 0;
+	const friendsPercentage = friendsOnline / Math.max(server.maxPlayers, 1);
+	const playersIcon = $(element).find(".players-icon");
+
+	if (server.playerPercentage >= 1) {
+		const friendsIndex = Math.min(friendsOnline, 1);
+		playersIcon.css("background-image", `url(images/server_full_${friendsIndex}.png)`);
+	} else if (server.playerPercentage > 0) {
+		const index = Math.min(3, Math.ceil(server.playerPercentage * 3));
+		const friendsIndex = Math.min(Math.ceil(friendsPercentage * 3), 3);
+		playersIcon.css("background-image", `url(images/server_players_${index}${friendsIndex}.png)`);
+	}
+
+	if (server.currentPlayers > 0) {
+		playersIcon.attr("title", `${server.currentPlayers}/${server.maxPlayers}`);
+	}
 }
 
 function addGamemodesToDropdown() {
@@ -374,7 +389,7 @@ function filterFavoriteServer(element, server) {
 }
 
 function filterServerSearch(element, server) {
-	const andCheck = $("#search").val().toUpperCase().split(/ +/).filter(Boolean);
+	const andCheck = $("#search").val().toUpperCase().split(/\s+/).filter(Boolean);
 	return andCheck.every((word) => {
 		const orCheck = word.split(/\/+/).filter(Boolean);
 		return orCheck.some((word) => foundSearchTerm(word, server));
@@ -554,9 +569,6 @@ function updateServerInfo() {
 	//description
 	const description = server.description.trim().replace(REGEX_WEBSITE, `<a href="$1" target="_blank">$1</a>`).replace(REGEX_EMAIL, `<a href="mailto:$1" target="_blank">$1</a>`);
 
-	//player list
-	const playerList = server.playerList.length ? `Players: ${server.playerList.sort((a, b) => compareCaseInsensitive(a, b)).join(", ")}` : "";
-
 	//add to panel
 	$("#gamemode span").text(server.gameMode);
 	$("#gamemode span").attr("title", server.gameMode);
@@ -564,7 +576,8 @@ function updateServerInfo() {
 	$("#key-info").html(`Players: ${players}<br />Reserved Slots: ${reservedSlots}<br />Map Size: ${server.mapW} x ${server.mapH}<br />${spectators}`);
 	$("#game-state").text(gameState);
 	$("#description").html(description);
-	$("#players").text(playerList);
+
+	updatePlayerList(server);
 
 	//minimap
 	getMinimap(server, function (img) {
@@ -582,6 +595,30 @@ function updateServerInfo() {
 		if (divW > imgW) $(img).css("left", (divW - imgW) / 2);
 		if (divH > imgH) $(img).css("top", (divH - imgH) / 2);
 	});
+}
+
+function updatePlayerList(server) {
+	server = server || getServerData(getSelectedServer());
+	if (!server) return;
+
+	let playerList = "";
+
+	if (server.playerList.length) {
+		playerList =
+			"Players: " +
+			server.playerList
+				.sort((a, b) => compareCaseInsensitive(a, b))
+				.map((username) => {
+					const element = $(`<span class='player'>${username}</span>`);
+					if (isFriend(username)) {
+						element.addClass("friend");
+					}
+					return element[0].outerHTML;
+				})
+				.join(", ");
+	}
+
+	$("#players").html(playerList);
 }
 
 function getMinimap(server, callback) {
@@ -608,13 +645,13 @@ function toggleFavoriteServer(element) {
 
 	const address = $(element).data("address");
 
-	if (isFavoriteServer(element)) {
+	if ($(element).hasClass("favorite")) {
 		if (!settings.favorites) {
 			settings.favorites = [];
 		}
 
 		//add to favorites
-		if (!settings.favorites.some((fav) => fav === address)) {
+		if (!isFavoriteServer(address)) {
 			settings.favorites.push(address);
 		}
 	} else if (settings.favorites) {
@@ -630,29 +667,64 @@ function toggleFavoriteServer(element) {
 	filterServers();
 }
 
-function isFavoriteServer(element) {
-	return $(element).hasClass("favorite");
+function isFavoriteServer(address) {
+	return settings.favorites && settings.favorites.some((fav) => fav === address);
+}
+
+function toggleFriend(element) {
+	if (!$(element).length) return;
+
+	$(element).toggleClass("friend");
+
+	const username = $(element).text();
+
+	if ($(element).hasClass("friend")) {
+		if (!settings.friends) {
+			settings.friends = [];
+		}
+
+		//add to favorites
+		if (!isFriend(username)) {
+			settings.friends.push(username);
+		}
+	} else if (settings.friends) {
+		//remove from favorites
+		const index = settings.friends.findIndex((fav) => fav === username);
+		if (index > -1) {
+			settings.friends.splice(index, 1);
+		}
+	}
+
+	chrome.storage.sync.set({ friends: settings.friends });
+
+	const serverElement = getSelectedServer();
+	const serverData = getServerData(serverElement);
+	updateServerPlayersIcon(serverElement, serverData);
+}
+
+function isFriend(username) {
+	return settings.friends && settings.friends.some((fav) => fav === username);
 }
 
 function setDefaults() {
-	if (settings.sort) {
-		$("#sort").attr("data-value", settings.sort);
+	if (settings.sortDropdown) {
+		$("#sort").val(settings.sortDropdown);
 	}
 
-	if (settings.modded) {
-		$("#modded").attr("data-value", settings.modded);
+	if (settings.moddedButton) {
+		$("#modded").attr("data-value", settings.moddedButton);
 	}
 
-	if (settings.password) {
-		$("#password").attr("data-value", settings.password);
+	if (settings.passwordButton) {
+		$("#password").attr("data-value", settings.passwordButton);
 	}
 
-	if (settings.officials) {
-		$("#officials").attr("data-value", settings.officials);
+	if (settings.officialsButton) {
+		$("#officials").attr("data-value", settings.officialsButton);
 	}
 
-	if (settings.favorites) {
-		$("#favorites").attr("data-value", settings.favorites);
+	if (settings.favoritesButton) {
+		$("#favorites").attr("data-value", settings.favoritesButton);
 	}
 
 	if (settings.sliderValues) {

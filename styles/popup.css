@@ -11,6 +11,7 @@
 	--selected-server-text-color: rgb(254, 254, 254);
 	--selected-modded-server-text-color: rgb(210, 230, 254);
 	--selected-official-server-text-color: rgb(254, 254, 210);
+	--friend-text-color: var(--selected-official-server-text-color);
 
 	--background-color: rgb(126, 140, 121);
 	--button-background-color: rgb(100, 113, 96);
@@ -305,9 +306,18 @@ a:hover {
 }
 
 #description,
-#players {
+#players,
+.player {
 	font-size: 11px;
 	font-weight: normal;
+}
+
+.player {
+	cursor: pointer;
+}
+
+.friend {
+	color: var(--friend-text-color);
 }
 
 /* EXTENSION INFO GRID */
