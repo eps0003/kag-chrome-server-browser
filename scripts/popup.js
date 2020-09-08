@@ -503,10 +503,7 @@ function sortServers() {
 
 function sortServerGamemode(a, b) {
 	if (a.gameMode === b.gameMode) {
-		if (a.name === b.name) {
-			return compareCaseInsensitive(a.address, b.address);
-		}
-		return compareCaseInsensitive(a.name, b.name);
+		return sortServerName(a, b);
 	}
 	return compareCaseInsensitive(a.gameMode, b.gameMode);
 }
@@ -516,10 +513,7 @@ function sortServerMapSize(a, b) {
 	const mapSizeB = b.mapW * b.mapH;
 
 	if (mapSizeA === mapSizeB) {
-		if (a.name === b.name) {
-			return compareCaseInsensitive(a.address, b.address);
-		}
-		return compareCaseInsensitive(a.name, b.name);
+		return sortServerName(a, b);
 	}
 	return mapSizeB - mapSizeA;
 }
@@ -533,30 +527,21 @@ function sortServerName(a, b) {
 
 function sortServerPlayerPercentage(a, b) {
 	if (a.playerPercentage === b.playerPercentage) {
-		if (a.name === b.name) {
-			return compareCaseInsensitive(a.address, b.address);
-		}
-		return compareCaseInsensitive(a.name, b.name);
+		return sortServerName(a, b);
 	}
 	return b.playerPercentage - a.playerPercentage;
 }
 
 function sortServerPlayerCount(a, b) {
 	if (a.currentPlayers === b.currentPlayers) {
-		if (a.name === b.name) {
-			return compareCaseInsensitive(a.address, b.address);
-		}
-		return compareCaseInsensitive(a.name, b.name);
+		return sortServerName(a, b);
 	}
 	return b.currentPlayers - a.currentPlayers;
 }
 
 function sortServerCountry(a, b) {
 	if (a.country === b.country) {
-		if (a.name === b.name) {
-			return compareCaseInsensitive(a.address, b.address);
-		}
-		return compareCaseInsensitive(a.name, b.name);
+		return sortServerName(a, b);
 	}
 	return compareCaseInsensitive(a.country, b.country);
 }
