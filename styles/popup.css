@@ -180,8 +180,8 @@ a:hover {
 
 .server {
 	display: grid;
-	grid-template-columns: auto 1fr auto;
-	grid-template-areas: "favorite name verified ping players gamemode password";
+	grid-template-columns: auto auto 1fr auto;
+	grid-template-areas: "favorite flag name verified ping players gamemode password";
 	padding: 14px;
 	background-color: var(--background-color);
 	box-shadow: var(--box-shadow);
@@ -242,6 +242,11 @@ a:hover {
 
 .server .name {
 	padding: 0px 10px;
+}
+
+.flag {
+	grid-area: flag;
+	margin: auto 0 auto 10px;
 }
 
 /* SERVER INFO GRID */

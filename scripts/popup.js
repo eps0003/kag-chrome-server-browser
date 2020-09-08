@@ -108,7 +108,7 @@ function getServers() {
 			server.official = server.name.match(/(?=^KAG Official( Small)? \w+ (AUS?|EU|USA?)\b)|(?=^Official Modded Server (AUS?|EU|USA?)\b)/g);
 		}
 
-		updateServers();
+		getServerCountries().then(updateServers);
 	})
 		.fail(function () {
 			servers = [];
@@ -117,6 +117,28 @@ function getServers() {
 		.always(function () {
 			canReload = true;
 		});
+}
+
+function getServerCountries() {
+	return new Promise(function (resolve, reject) {
+		//get unique ips
+		const ips = servers.map((server) => server.IPv4Address).filter(filterUnique);
+
+		//get country data
+		$.get(`https://get.geojs.io/v1/ip/country.json?ip=${ips.join(",")}`, (data) => {
+			for (const entry of data) {
+				//add country info to servers with the same ip
+				servers
+					.filter((server) => server.IPv4Address === entry.ip)
+					.forEach((server) => {
+						server.country = entry.name;
+						server.countryCode = entry.country;
+					});
+			}
+
+			resolve();
+		});
+	});
 }
 
 function updateServers() {
@@ -197,6 +219,12 @@ function updateServers() {
 			verifiedIcon.attr("title", `Verified Mods`);
 		}
 
+		//flag
+		const flag = $("<div>");
+		flag.addClass(`flag flag-${server.countryCode.toLowerCase()}`);
+		flag.attr("title", server.country);
+		element.append(flag);
+
 		//add to server list
 		$("#server-grid").append(element);
 	}
@@ -256,7 +284,7 @@ function addGamemodesToDropdown() {
 	//add gamemodes
 	servers
 		.map((server) => server.gameMode)
-		.filter((x, i, a) => a.indexOf(x) === i)
+		.filter(filterUnique)
 		.sort()
 		.forEach((gamemode) =>
 			$("#gamemodes").append(
@@ -409,7 +437,9 @@ function foundSearchTerm(word, server) {
 		//ip address
 		(word.match(/[:\.]/) && server.address.includes(word)) ||
 		//server description
-		server.description.toUpperCase().includes(word)
+		server.description.toUpperCase().includes(word) ||
+		//server country
+		(server.country && server.country.toUpperCase().includes(word))
 	);
 }
 
@@ -462,6 +492,8 @@ function sortServers() {
 					return sortServerMapSize(serverA, serverB);
 				case "name":
 					return sortServerName(serverA, serverB);
+				case "country":
+					return sortServerCountry(serverA, serverB);
 				default:
 					return sortServerPlayerCount(serverA, serverB);
 			}
@@ -517,6 +549,16 @@ function sortServerPlayerCount(a, b) {
 		return compareCaseInsensitive(a.name, b.name);
 	}
 	return b.currentPlayers - a.currentPlayers;
+}
+
+function sortServerCountry(a, b) {
+	if (a.country === b.country) {
+		if (a.name === b.name) {
+			return compareCaseInsensitive(a.address, b.address);
+		}
+		return compareCaseInsensitive(a.name, b.name);
+	}
+	return compareCaseInsensitive(a.country, b.country);
 }
 
 function compareCaseInsensitive(a, b) {
@@ -731,4 +773,8 @@ function setDefaults() {
 		$("#min-players").text(Math.min(...settings.sliderValues) + "%");
 		$("#max-players").text(Math.max(...settings.sliderValues) + "%");
 	}
+}
+
+function filterUnique(x, i, a) {
+	return i === a.indexOf(x);
 }
