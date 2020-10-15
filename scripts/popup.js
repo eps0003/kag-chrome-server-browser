@@ -270,7 +270,8 @@ function updateServerPlayersIcon(element, server) {
 	}
 
 	if (server.currentPlayers > 0) {
-		playersIcon.attr("title", `${server.currentPlayers}/${server.maxPlayers}`);
+		const friendCount = friendsOnline ? ` (${friendsOnline})` : "";
+		playersIcon.attr("title", `${server.currentPlayers}/${server.maxPlayers}${friendCount}`);
 	}
 }
 
