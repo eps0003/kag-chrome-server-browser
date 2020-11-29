@@ -21,6 +21,9 @@
 			"128": "images/kag_icon_128.png"
 		}
 	},
+	"background": {
+		"scripts": ["libraries/jquery.min.js", "scripts/background.js"]
+	},
 	"options_ui": {
 		"chrome_style": true,
 		"page": "options.html"
