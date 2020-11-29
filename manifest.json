@@ -22,7 +22,7 @@
 		}
 	},
 	"background": {
-		"scripts": ["libraries/jquery.min.js", "scripts/background.js"]
+		"scripts": ["libraries/jquery.min.js", "scripts/utilities.js", "scripts/background.js"]
 	},
 	"options_ui": {
 		"chrome_style": true,

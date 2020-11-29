@@ -9,7 +9,6 @@ const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
 $(function () {
 	chrome.storage.sync.get(null, function (data) {
 		settings = data;
-		console.log(settings);
 
 		setDefaults();
 
@@ -323,25 +322,6 @@ function addGamemodesToDropdown() {
 	//reselect selected gamemode
 	$("#gamemodes").val(gamemodesVal);
 }
-
-function mode(arr) {
-	const freq = {};
-	for (const item of arr) {
-		freq[item] = (freq[item] || 0) + 1;
-	}
-
-	let compare = 0;
-	let mode;
-	for (const item in freq) {
-		if (freq[item] > compare) {
-			compare = freq[item];
-			mode = item;
-		}
-	}
-
-	return Number(mode);
-}
-
 function getCurrentBuild() {
 	return mode(servers.map((server) => server.build));
 }
@@ -496,10 +476,6 @@ function getServerData(element) {
 	return servers.find((server) => server.address === address);
 }
 
-function plural(val, text, suffix = "s") {
-	return Number(val) === 1 ? text : text + suffix;
-}
-
 function sortServers() {
 	const val = $("#sort").val();
 
@@ -569,10 +545,6 @@ function sortServerCountry(a, b) {
 		return sortServerName(a, b);
 	}
 	return compareCaseInsensitive(a.country, b.country);
-}
-
-function compareCaseInsensitive(a, b) {
-	return a.localeCompare(b, undefined, { sensitivity: "base" });
 }
 
 function selectServer(element) {
@@ -758,8 +730,4 @@ function setDefaults() {
 	$("#favorites").attr("data-value", settings.favoritesButton);
 	$("#min-players").text(Math.min(...settings.sliderValues) + "%");
 	$("#max-players").text(Math.max(...settings.sliderValues) + "%");
-}
-
-function filterUnique(x, i, a) {
-	return i === a.indexOf(x);
 }
