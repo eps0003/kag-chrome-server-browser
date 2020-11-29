@@ -15,9 +15,9 @@ $(function () {
 
 		$("#slider").slider({
 			range: true,
-			values: settings.sliderValues || [0, 100],
+			values: settings.sliderValues,
 			create: function (e, ui) {
-				updateSliderLabels(settings.sliderValues || [0, 100]);
+				updateSliderLabels(settings.sliderValues);
 			},
 			change: function (e, ui) {
 				updateSliderLabels(ui.values);
@@ -39,9 +39,10 @@ $(function () {
 		$(".button").click(function () {
 			if ($(this).hasClass("disabled")) return;
 
-			if (settings.buttonSounds) {
+			if (settings.buttonVolume) {
 				const audio = new Audio("audio/menuclick.ogg");
 				audio.currentTime = 0;
+				audio.volume = settings.buttonVolume / 100;
 				audio.play();
 			}
 		});
@@ -279,7 +280,7 @@ function updateServerPlayersIcon(element, server) {
 	if (!$(element).length || !server) return;
 
 	//players
-	const friendsOnline = settings.friends ? settings.friends.filter((username) => server.playerList.includes(username)).length : 0;
+	const friendsOnline = settings.friends.filter((username) => server.playerList.includes(username)).length;
 	const friendsPercentage = friendsOnline / Math.max(server.maxPlayers, 1);
 	const playersIcon = $(element).find(".players-icon");
 
@@ -697,15 +698,11 @@ function toggleFavoriteServer(element) {
 	const address = $(element).data("address");
 
 	if ($(element).hasClass("favorite")) {
-		if (!settings.favorites) {
-			settings.favorites = [];
-		}
-
 		//add to favorites
 		if (!isFavoriteServer(address)) {
 			settings.favorites.push(address);
 		}
-	} else if (settings.favorites) {
+	} else {
 		//remove from favorites
 		const index = settings.favorites.findIndex((fav) => fav === address);
 		if (index > -1) {
@@ -719,7 +716,7 @@ function toggleFavoriteServer(element) {
 }
 
 function isFavoriteServer(address) {
-	return settings.favorites && settings.favorites.some((fav) => fav === address);
+	return settings.favorites.some((fav) => fav === address);
 }
 
 function toggleFriend(element) {
@@ -730,15 +727,11 @@ function toggleFriend(element) {
 	const username = $(element).text();
 
 	if ($(element).hasClass("friend")) {
-		if (!settings.friends) {
-			settings.friends = [];
-		}
-
 		//add to favorites
 		if (!isFriend(username)) {
 			settings.friends.push(username);
 		}
-	} else if (settings.friends) {
+	} else {
 		//remove from favorites
 		const index = settings.friends.findIndex((fav) => fav === username);
 		if (index > -1) {
@@ -754,34 +747,17 @@ function toggleFriend(element) {
 }
 
 function isFriend(username) {
-	return settings.friends && settings.friends.some((fav) => fav === username);
+	return settings.friends.some((fav) => fav === username);
 }
 
 function setDefaults() {
-	if (settings.sortDropdown) {
-		$("#sort").val(settings.sortDropdown);
-	}
-
-	if (settings.moddedButton) {
-		$("#modded").attr("data-value", settings.moddedButton);
-	}
-
-	if (settings.passwordButton) {
-		$("#password").attr("data-value", settings.passwordButton);
-	}
-
-	if (settings.officialsButton) {
-		$("#officials").attr("data-value", settings.officialsButton);
-	}
-
-	if (settings.favoritesButton) {
-		$("#favorites").attr("data-value", settings.favoritesButton);
-	}
-
-	if (settings.sliderValues) {
-		$("#min-players").text(Math.min(...settings.sliderValues) + "%");
-		$("#max-players").text(Math.max(...settings.sliderValues) + "%");
-	}
+	$("#sort").val(settings.sortDropdown);
+	$("#modded").attr("data-value", settings.moddedButton);
+	$("#password").attr("data-value", settings.passwordButton);
+	$("#officials").attr("data-value", settings.officialsButton);
+	$("#favorites").attr("data-value", settings.favoritesButton);
+	$("#min-players").text(Math.min(...settings.sliderValues) + "%");
+	$("#max-players").text(Math.max(...settings.sliderValues) + "%");
 }
 
 function filterUnique(x, i, a) {
