@@ -25,7 +25,7 @@ $(function () {
 			slide: function (e, ui) {
 				updateSliderLabels(ui.values);
 
-				//manually set values so it doesnt use the previous values when filtering players
+				//manually set values so it doesnt use the previous values when filtering servers
 				$("#slider").slider("values", ui.values);
 
 				filterServers();
