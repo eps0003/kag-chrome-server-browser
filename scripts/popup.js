@@ -39,9 +39,11 @@ $(function () {
 		$(".button").click(function () {
 			if ($(this).hasClass("disabled")) return;
 
-			const audio = new Audio("audio/menuclick.ogg");
-			audio.currentTime = 0;
-			audio.play();
+			if (settings.buttonSounds) {
+				const audio = new Audio("audio/menuclick.ogg");
+				audio.currentTime = 0;
+				audio.play();
+			}
 		});
 
 		$("#reload").click(function () {
@@ -73,10 +75,19 @@ $(function () {
 
 		$("#search").on("input", function () {
 			filterServers();
+
+			//select only visible server
+			if (settings.autoSelectServer && $(".server:visible").length === 1) {
+				selectServer(".server:visible");
+			}
 		});
 
 		$("#players").on("click", ".player", function () {
 			toggleFriend(this);
+		});
+
+		$("#options").click(function () {
+			chrome.runtime.openOptionsPage();
 		});
 
 		getServers();
@@ -220,10 +231,12 @@ function updateServers() {
 		}
 
 		//flag
-		const flag = $("<div>");
-		flag.addClass(`flag flag-${server.countryCode.toLowerCase()}`);
-		flag.attr("title", server.country);
-		element.append(flag);
+		if (settings.serverFlag) {
+			const flag = $("<div>");
+			flag.addClass(`flag flag-${server.countryCode.toLowerCase()}`);
+			flag.attr("title", server.country);
+			element.append(flag);
+		}
 
 		//add to server list
 		$("#server-grid").append(element);
@@ -233,6 +246,16 @@ function updateServers() {
 	sortServers();
 
 	addGamemodesToDropdown();
+
+	//auto select most populated server
+	if (settings.autoSelectTopServer && !isServerSelected(".server")) {
+		const firstServer = $(".server").first();
+		const data = getServerData(firstServer);
+
+		if (data.currentPlayers > 0) {
+			selectServer(firstServer);
+		}
+	}
 
 	$(".server").click(function () {
 		selectServer(this);
@@ -345,7 +368,7 @@ function filterServers() {
 }
 
 function filterOutdatedServer(element, server) {
-	return !$(element).hasClass("outdated");
+	return settings.displayOutdatedServers || !$(element).hasClass("outdated");
 }
 
 function filterLockedServer(element, server) {

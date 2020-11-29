@@ -180,8 +180,8 @@ a:hover {
 
 .server {
 	display: grid;
-	grid-template-columns: auto auto 1fr auto;
-	grid-template-areas: "favorite flag name verified ping players gamemode password";
+	grid-template-columns: auto auto 1fr;
+	grid-template-areas: "favorite flag name verified players gamemode password";
 	padding: 14px;
 	background-color: var(--background-color);
 	box-shadow: var(--box-shadow);
@@ -240,13 +240,34 @@ a:hover {
 	background-image: url(../images/server_favorite.png);
 }
 
+.server .favorite-icon {
+	grid-area: favorite;
+}
+
+.server .flag {
+	grid-area: flag;
+	margin: auto 0 auto 10px;
+}
+
 .server .name {
+	grid-area: name;
 	padding: 0px 10px;
 }
 
-.flag {
-	grid-area: flag;
-	margin: auto 0 auto 10px;
+.server .verified-icon {
+	grid-area: verified;
+}
+
+.server .players-icon {
+	grid-area: players;
+}
+
+.server .gamemode-icon {
+	grid-area: gamemode;
+}
+
+.server .password-icon {
+	grid-area: password;
 }
 
 /* SERVER INFO GRID */
@@ -358,8 +379,26 @@ a:hover {
 	margin: auto;
 }
 
+#extension-info-grid header {
+	position: relative;
+}
+
 #extension-info-grid footer {
 	grid-area: footer;
+}
+
+#options {
+	position: absolute;
+	top: -2px;
+	right: 2px;
+	cursor: pointer;
+	transform: scale(0.5);
+	transform-origin: top right;
+	transition: transform 0.2s;
+}
+
+#options:hover {
+	transform: initial;
 }
 
 /* SEARCH GRID */

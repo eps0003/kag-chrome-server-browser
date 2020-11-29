@@ -1,0 +1,146 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>KAG Server Browser</title>
+		<link rel="stylesheet" type="text/css" href="styles/options.css" />
+		<script src="libraries/jquery-3.5.1.min.js"></script>
+		<script src="scripts/options.js"></script>
+	</head>
+
+	<body>
+		<div id="optionsGrid">
+			<h1>Server Browser</h1>
+
+			<div id="badge" class="option toggleOption">
+				<label for="badgeCheckbox">
+					<input type="checkbox" id="badgeCheckbox" class="toggle" />
+					Show icon badge with...
+				</label>
+				<div class="indent">
+					<label for="badgeRadioAll">
+						<input type="radio" id="badgeRadioAll" name="badgeValue" value="all" />
+						Player count of all servers
+					</label>
+
+					<label for="badgeRadioFavorites">
+						<input type="radio" id="badgeRadioFavorites" name="badgeValue" value="favorites" />
+						Player count of favorite servers
+					</label>
+
+					<label for="badgeRadioFriends">
+						<input type="radio" id="badgeRadioFriends" name="badgeValue" value="friends" />
+						Friends online on any server
+					</label>
+
+					<label for="badgeRadioFriends">
+						<input type="radio" id="badgeRadioFriendsFavorites" name="badgeValue" value="friends" />
+						Friends online on favorite servers
+					</label>
+				</div>
+			</div>
+
+			<div id="drag" class="option toggleOption">
+				<label for="dragCheckbox">
+					<input type="checkbox" id="dragCheckbox" class="toggle" />
+					Drag to scroll server list<br />
+					(may make it more difficult to click on servers)
+				</label>
+			</div>
+
+			<div id="autoSelectServer" class="option toggleOption">
+				<label for="autoSelectServerCheckbox">
+					<input type="checkbox" id="autoSelectServerCheckbox" class="toggle" />
+					Auto select the only visible server when searching
+				</label>
+			</div>
+
+			<div id="autoSelectTopServer" class="option toggleOption">
+				<label for="autoSelectTopServerCheckbox">
+					<input type="checkbox" id="autoSelectTopServerCheckbox" class="toggle" />
+					Auto select the most populated server when opening the extension
+				</label>
+			</div>
+
+			<div id="displayOutdatedServers" class="option toggleOption">
+				<label for="displayOutdatedServersCheckbox">
+					<input type="checkbox" id="displayOutdatedServersCheckbox" class="toggle" />
+					Display servers that aren't running the current build<br />
+					(these servers will be striked through and unjoinable)
+				</label>
+			</div>
+
+			<div id="serverFlag" class="option toggleOption">
+				<label for="serverFlagCheckbox">
+					<input type="checkbox" id="serverFlagCheckbox" class="toggle" />
+					Display server country flag next to server name
+				</label>
+			</div>
+
+			<hr />
+			<h1>Notifications</h1>
+
+			<div id="notifications" class="option">
+				<label for="notificationInterval">
+					Display desktop notifications for favourited servers
+					<select id="notificationInterval">
+						<option value="0">Never</option>
+						<option value="1">Every 1 player</option>
+						<option value="2">Every 2 players</option>
+						<option value="3">Every 3 players</option>
+						<option value="4">Every 4 players</option>
+						<option value="5">Every 5 players</option>
+						<option value="6">Every 6 players</option>
+						<option value="7">Every 7 players</option>
+						<option value="8">Every 8 players</option>
+						<option value="9">Every 9 players</option>
+						<option value="10">Every 10 players</option>
+					</select>
+				</label>
+			</div>
+
+			<div id="notificationClick" class="option toggleOption">
+				<label for="notificationClickCheckbox">
+					<input type="checkbox" id="notificationClickCheckbox" class="toggle" />
+					Click on a desktop notification to join the server<br />
+					(uses last saved password for locked servers)
+				</label>
+			</div>
+
+			<hr />
+			<h1>Sounds</h1>
+
+			<div id="notificationVolume" class="option">
+				<label for="notificationVolumeSlider">
+					Notification sounds - <span class="value">??</span>% volume
+					<input type="range" id="notificationVolumeSlider" />
+				</label>
+			</div>
+
+			<div id="buttonVolume" class="option">
+				<label for="buttonVolumeSlider">
+					Button sounds - <span class="value">??</span>% volume
+					<input type="range" id="buttonVolumeSlider" />
+				</label>
+			</div>
+
+			<hr />
+			<h1>Miscellaneous</h1>
+
+			<div id="refreshInterval" class="option">
+				<label for="refreshIntervalSlider">
+					Background refresh interval - <span class="value">??</span> min<br />
+					(for updating icon badge and notifications)
+					<input type="range" id="refreshIntervalSlider" min="1" max="30" />
+				</label>
+			</div>
+
+			<div id="buttons">
+				<button type="button" id="clearFavorites">Clear all favorites</button>
+				<button type="button" id="clearFriends">Clear friends</button>
+				<button type="button" id="clearPasswords">Clear passwords</button>
+				<button type="button" id="resetSettings">Reset settings</button>
+				<button type="button" id="resetAll">Reset everything!</button>
+			</div>
+		</div>
+	</body>
+</html>
