@@ -1,3 +1,4 @@
+const background = chrome.extension.getBackgroundPage();
 let servers = [];
 let settings = {};
 let canReload = true;
@@ -654,6 +655,10 @@ function toggleFavoriteServer(element) {
 
 	chrome.storage.sync.set({ favorites: settings.favorites });
 
+	if (["favorites", "friendsFavorites"].includes(settings.badgeValue)) {
+		background.updateBadge();
+	}
+
 	filterServers();
 }
 
@@ -682,6 +687,10 @@ function toggleFriend(element) {
 	}
 
 	chrome.storage.sync.set({ friends: settings.friends });
+
+	if (["friendsAll", "friendsFavorites"].includes(settings.badgeValue)) {
+		background.updateBadge();
+	}
 
 	const serverElement = getSelectedServer();
 	const serverData = getServerData(serverElement);
