@@ -17,25 +17,7 @@ function installedExtension(version) {
 function updatedExtension(prevVersion, thisVersion) {}
 
 function receivedServers() {
-	chrome.storage.sync.get(null, (settings) => {
-		//icon badge
-		if (settings.badge) {
-			const favoriteServers = servers.filter((server) => settings.favorites.includes(server.address));
-
-			let players;
-			if (settings.badgeValue === "favorites") {
-				players = countPlayersInServer(favoriteServers);
-			} else if (settings.badgeValue === "friendsAll") {
-				players = countPlayersInServer(servers, settings.friends);
-			} else if (settings.badgeValue === "friendsFavorites") {
-				players = countPlayersInServer(favoriteServers, settings.friends);
-			} else {
-				players = countPlayersInServer(servers);
-			}
-
-			chrome.browserAction.setBadgeText({ text: players.toString() });
-		}
-	});
+	updateBadge();
 }
 
 function errorReceivingServers(err) {
@@ -59,8 +41,26 @@ function countPlayersInServer(servers, friends = null) {
 	}, 0);
 }
 
-function serverHasFriend(server, friends) {
-	return server.playerList.some((player) => friends.includes(player));
+function updateBadge() {
+	chrome.storage.sync.get(["badge", "badgeValue", "favorites", "friends"], ({ badge, badgeValue, favorites, friends }) => {
+		let players = "";
+
+		if (badge) {
+			const favoriteServers = servers.filter((server) => favorites.includes(server.address));
+
+			if (badgeValue === "favorites") {
+				players = countPlayersInServer(favoriteServers);
+			} else if (badgeValue === "friendsAll") {
+				players = countPlayersInServer(servers, friends);
+			} else if (badgeValue === "friendsFavorites") {
+				players = countPlayersInServer(favoriteServers, friends);
+			} else {
+				players = countPlayersInServer(servers);
+			}
+		}
+
+		chrome.browserAction.setBadgeText({ text: players.toString() });
+	});
 }
 
 loop();
@@ -79,8 +79,8 @@ function loop() {
 	});
 }
 
-function initSettings() {
-	chrome.storage.sync.set({
+function getDefaultSettings() {
+	return {
 		favorites: [],
 		friends: [],
 
@@ -104,9 +104,13 @@ function initSettings() {
 		badge: true,
 		badgeValue: "all",
 
-		notificationInterval: 6,
+		notificationInterval: "6",
 		notificationVolume: 0,
 
 		refreshInterval: 1,
-	});
+	};
+}
+
+function initSettings() {
+	chrome.storage.sync.set(getDefaultSettings());
 }
