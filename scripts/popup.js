@@ -100,6 +100,8 @@ function updateSliderLabels(values) {
 }
 
 function reloadServers() {
+	if (!canReload) return;
+
 	canReload = false;
 
 	selectedServer = $(".server.selected").attr("data-address");
