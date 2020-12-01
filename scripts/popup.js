@@ -47,7 +47,7 @@ $(function () {
 		});
 
 		$("#reload").click(function () {
-			getServers();
+			reloadServers();
 		});
 
 		$("#play").click(function () {
@@ -90,7 +90,7 @@ $(function () {
 			chrome.runtime.openOptionsPage();
 		});
 
-		getServers();
+		reloadServers();
 	});
 });
 
@@ -99,7 +99,7 @@ function updateSliderLabels(values) {
 	$("#max-players").text(Math.max(...values) + "%");
 }
 
-function getServers() {
+function reloadServers() {
 	canReload = false;
 
 	selectedServer = $(".server.selected").attr("data-address");
@@ -107,55 +107,26 @@ function getServers() {
 	$("#server-grid").empty();
 	$("#count").text("Loading servers...");
 
-	$.get('https://api.kag2d.com/v1/game/thd/kag/servers?filters=[{"field":"current","op":"eq","value":"true"},{"field":"connectable","op":"eq","value":true}]&' + new Date().valueOf(), function (data) {
-		servers = data.serverList;
-
-		const currentBuild = getCurrentBuild();
-		for (const i in data.serverList) {
-			const server = data.serverList[i];
-
-			server.outdated = server.build !== currentBuild;
-			server.address = `${server.IPv4Address}:${server.port}`;
-			server.official = server.name.match(/(?=^KAG Official( Small)? \w+ (AUS?|EU|USA?)\b)|(?=^Official Modded Server (AUS?|EU|USA?)\b)/g);
-		}
-
-		getServerCountries().then(updateServers);
-	})
-		.fail(function () {
-			servers = [];
-			console.warn("Unable to retrieve servers");
+	getServers()
+		.then((x) => {
+			servers = x;
+			updateServers();
 		})
-		.always(function () {
+		.catch((err) => {
+			console.warn(err);
+			servers = [];
+		})
+		.finally(() => {
 			canReload = true;
 		});
-}
-
-function getServerCountries() {
-	return new Promise(function (resolve, reject) {
-		//get unique ips
-		const ips = servers.map((server) => server.IPv4Address).filter(filterUnique);
-
-		//get country data
-		$.get(`https://get.geojs.io/v1/ip/country.json?ip=${ips.join(",")}`, (data) => {
-			for (const entry of data) {
-				//add country info to servers with the same ip
-				servers
-					.filter((server) => server.IPv4Address === entry.ip)
-					.forEach((server) => {
-						server.country = entry.name;
-						server.countryCode = entry.country;
-					});
-			}
-
-			resolve();
-		});
-	});
 }
 
 function updateServers() {
 	$("#server-grid").empty();
 
-	for (const server of servers) {
+	for (const i in servers) {
+		const server = servers[i];
+
 		//clone template element
 		const element = cloneTemplateElement("#server-template");
 
@@ -231,7 +202,7 @@ function updateServers() {
 		}
 
 		//flag
-		if (settings.serverFlag) {
+		if (settings.serverFlag && server.country) {
 			const flag = $("<div>");
 			flag.addClass(`flag flag-${server.countryCode.toLowerCase()}`);
 			flag.attr("title", server.country);
@@ -321,9 +292,6 @@ function addGamemodesToDropdown() {
 
 	//reselect selected gamemode
 	$("#gamemodes").val(gamemodesVal);
-}
-function getCurrentBuild() {
-	return mode(servers.map((server) => server.build));
 }
 
 function filterServers() {
