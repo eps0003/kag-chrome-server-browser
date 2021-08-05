@@ -1,4 +1,5 @@
 let servers;
+let previousPlayers = {};
 
 chrome.runtime.onInstalled.addListener(function (details) {
 	const thisVersion = chrome.runtime.getManifest().version;
@@ -18,6 +19,7 @@ function updatedExtension(prevVersion, thisVersion) {}
 
 function receivedServers() {
 	updateBadge();
+	processNotifications();
 }
 
 function errorReceivingServers(err) {
@@ -63,17 +65,82 @@ function updateBadge() {
 	});
 }
 
+function processNotifications() {
+	chrome.notifications.getAll((ids) => {
+		for (const id in ids) {
+			chrome.notifications.clear(id);
+		}
+	});
+
+	chrome.storage.sync.get(["favorites", "notificationInterval", "notificationVolume"], ({ favorites, notificationInterval, notificationVolume }) => {
+		if (notificationInterval === "0") return;
+
+		const notifications = [];
+
+		for (const fav of favorites) {
+			//previous players haven't been stored
+			if (previousPlayers[fav] === undefined) continue;
+
+			//find server
+			const server = servers.find((x) => fav === x.address);
+			if (!server) continue;
+
+			const floor = Math.floor(server.currentPlayers / notificationInterval) * notificationInterval;
+
+			if (previousPlayers[fav] < floor && server.currentPlayers >= floor) {
+				notifications.push(server);
+			}
+		}
+
+		if (notifications.length) {
+			notifications.sort((a, b) => b.currentPlayers - a.currentPlayers);
+
+			chrome.notifications.create(notifications[0].address, {
+				type: "list",
+				title: "KAG Server Browser",
+				message: "test",
+				items: notifications.map((x) => ({ title: `${x.currentPlayers}/${x.maxPlayers}`, message: x.name })),
+				iconUrl: "images/kag_icon_128.png",
+				silent: true,
+			});
+
+			if (notificationVolume) {
+				const audio = new Audio("audio/spawn.ogg");
+				audio.currentTime = 0;
+				audio.volume = notificationVolume / 100;
+				audio.play();
+			}
+		}
+	});
+}
+
+chrome.notifications.onClicked.addListener((id) => {
+	chrome.storage.sync.get("notificationClick", ({ notificationClick }) => {
+		if (notificationClick) {
+			window.open("kag://" + id);
+		}
+	});
+});
+
 loop();
 function loop() {
 	getServers()
 		.then((x) => {
+			if (servers) {
+				previousPlayers = {};
+				for (const server of servers) {
+					previousPlayers[server.address] = server.currentPlayers;
+				}
+			}
+
 			servers = x;
+
 			receivedServers();
 		})
 		.catch(errorReceivingServers);
 
 	chrome.storage.sync.get("refreshInterval", ({ refreshInterval }) => {
-		const ms = 60000 * refreshInterval;
+		const ms = 1000 * refreshInterval;
 		const delay = ms - (new Date() % ms);
 		setTimeout(loop, delay);
 	});
