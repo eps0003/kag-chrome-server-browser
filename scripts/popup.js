@@ -397,7 +397,7 @@ function updateServers() {
 		e.stopPropagation();
 	});
 
-	$(".server *").dblclick(function (e) {
+	$(".server > *:not(.name)").dblclick(function (e) {
 		e.stopPropagation();
 	});
 }
