@@ -91,6 +91,28 @@ $(function () {
 			$(this).text(text[index]);
 		}
 	});
+
+	$("#keyboardNavigation").attr(
+		"title",
+		[
+			//
+			"Up/Down: Select the prev/next server",
+			"Shift Up/Down: Select the first/last server",
+			"Ctrl Up/Down: Select the prev/next favourited server",
+			"Ctrl Shift Up/Down: Select the first/last favourited server",
+			"Ctrl Space: Favourite/unfavourite the selected server",
+			"Ctrl R or F5: Reload servers",
+			"Ctrl M: Click the modded filter button",
+			"Ctrl P: Click the password filter button",
+			"Ctrl O: Click the officials filter button",
+			"Ctrl F: Click the favorites filter button",
+			"Enter: Join the selected server",
+			"Tab: Select the next sort dropdown option",
+			"Shift Tab: Select the prev sort dropdown option",
+			"Escape: Close all visible modal boxes or the extension window if none are visible",
+			"(You can also bind a key to open the extension by going to chrome://extensions/shortcuts)",
+		].join("\n")
+	);
 });
 
 function setDefaults() {

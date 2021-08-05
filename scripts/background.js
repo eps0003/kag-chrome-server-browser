@@ -162,6 +162,8 @@ function getDefaultSettings() {
 		serverFlag: true,
 		drag: false,
 
+		keyboardNavigation: true,
+
 		sliderValues: [0, 100],
 
 		autoSelectServer: false,

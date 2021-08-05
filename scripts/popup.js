@@ -93,49 +93,56 @@ $(function () {
 		});
 
 		$(document).keydown(function (e) {
-			if ((e.ctrlKey && e.key === "r") || e.key === "F5") {
-				$("#reload").click();
-			} else if (e.key === "Enter") {
-				$("#play").click();
-			} else if (e.ctrlKey && e.key === "m") {
-				$("#modded").click();
-			} else if (e.ctrlKey && e.key === "p") {
-				$("#password").click();
-			} else if (e.ctrlKey && e.key === "o") {
-				$("#officials").click();
-			} else if (e.ctrlKey && e.key === "f") {
-				$("#favorites").click();
-			} else if (e.ctrlKey && e.key === " ") {
-				toggleFavoriteServer(".server.selected");
-			} else if (e.key === "Tab") {
-				//cycle through sort options
-				if (e.shiftKey) {
-					//previous sort option
-					if ($("#sort option:selected").prop("index") === 0) {
-						//doesnt auto loop like .next() does for some reason
-						$("#sort option:selected").prop("selected", false);
-						$("#sort option:last").prop("selected", true);
-					} else {
-						$("#sort option:selected").prop("selected", false).prev().prop("selected", true);
-					}
-				} else {
-					//next sort option
-					$("#sort option:selected").prop("selected", false).next().prop("selected", true);
-				}
+			let usedKeybind = true;
 
-				sortServers();
-			} else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-				scrollUpList(e);
-			} else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-				scrollDownList(e);
-			} else if (!$(".modal input").is(":focus")) {
-				$("#search").focus();
-				return;
-			} else {
-				return;
+			if (settings.keyboardNavigation) {
+				if ((e.ctrlKey && e.key === "r") || e.key === "F5") {
+					$("#reload").click();
+				} else if (e.key === "Enter") {
+					$("#play").click();
+				} else if (e.ctrlKey && e.key === "m") {
+					$("#modded").click();
+				} else if (e.ctrlKey && e.key === "p") {
+					$("#password").click();
+				} else if (e.ctrlKey && e.key === "o") {
+					$("#officials").click();
+				} else if (e.ctrlKey && e.key === "f") {
+					$("#favorites").click();
+				} else if (e.ctrlKey && e.key === " ") {
+					toggleFavoriteServer(".server.selected");
+				} else if (e.key === "Tab") {
+					//cycle through sort options
+					if (e.shiftKey) {
+						//previous sort option
+						if ($("#sort option:selected").prop("index") === 0) {
+							//doesnt auto loop like .next() does for some reason
+							$("#sort option:selected").prop("selected", false);
+							$("#sort option:last").prop("selected", true);
+						} else {
+							$("#sort option:selected").prop("selected", false).prev().prop("selected", true);
+						}
+					} else {
+						//next sort option
+						$("#sort option:selected").prop("selected", false).next().prop("selected", true);
+					}
+
+					sortServers();
+				} else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+					scrollUpList(e);
+				} else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+					scrollDownList(e);
+				} else {
+					usedKeybind = false;
+				}
 			}
 
-			e.preventDefault();
+			if (!usedKeybind) {
+				if (!$(".modal input").is(":focus")) {
+					$("#search").focus();
+				}
+			} else {
+				e.preventDefault();
+			}
 		});
 
 		reloadServers();
