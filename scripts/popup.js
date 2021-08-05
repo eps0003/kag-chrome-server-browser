@@ -221,14 +221,8 @@ function updateServers() {
 
 	addGamemodesToDropdown();
 
-	//auto select most populated server
-	if (settings.autoSelectTopServer && !isServerSelected(".server")) {
-		const firstServer = $(".server").first();
-		const data = getServerData(firstServer);
-
-		if (data.currentPlayers > 0) {
-			selectServer(firstServer);
-		}
+	if (settings.autoSelectFirstServer) {
+		selectServer($(".server:visible").first());
 	}
 
 	$(".server").click(function () {

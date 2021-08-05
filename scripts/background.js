@@ -165,7 +165,7 @@ function getDefaultSettings() {
 		sliderValues: [0, 100],
 
 		autoSelectServer: false,
-		autoSelectTopServer: false,
+		autoSelectFirstServer: false,
 		displayOutdatedServers: false,
 
 		badge: true,
