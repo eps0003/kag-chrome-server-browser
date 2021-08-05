@@ -84,6 +84,7 @@ $(function () {
 		});
 
 		$("#players").on("click", ".player", function () {
+			if (isDragging("#info")) return;
 			toggleFriend(this);
 		});
 
@@ -94,6 +95,10 @@ $(function () {
 		reloadServers();
 	});
 });
+
+function isDragging(element) {
+	return $(element).hasClass("dragging");
+}
 
 function updateSliderLabels(values) {
 	$("#min-players").text(Math.min(...values) + "%");
@@ -226,14 +231,17 @@ function updateServers() {
 	}
 
 	$(".server").click(function () {
+		if (isDragging("#server-list")) return;
 		selectServer(this);
 	});
 
 	$(".server").dblclick(function () {
+		if (isDragging("#server-list")) return;
 		$("#play").click();
 	});
 
 	$(".server .favorite-icon").click(function (e) {
+		if (isDragging("#server-list")) return;
 		toggleFavoriteServer($(this).parent());
 		e.stopPropagation();
 	});
