@@ -411,10 +411,6 @@ function createCreatorContextMenu() {
 		open("https://discordapp.com/users/193177252815568897");
 	});
 
-	addContextButton(contextMenu, "Discord", function () {
-		open("https://discordapp.com/users/193177252815568897");
-	});
-
 	// addContextButton(contextMenu, "Donate", function () {
 	// 	open("");
 	// });
