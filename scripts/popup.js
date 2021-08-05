@@ -36,7 +36,7 @@ $(function () {
 			},
 		});
 
-		$(".button").click(function () {
+		$(document).on("click", ".button", function () {
 			if ($(this).hasClass("disabled")) return;
 
 			if (settings.buttonVolume) {
@@ -226,7 +226,7 @@ function reloadServers() {
 
 	canReload = false;
 
-	selectedServer = $(".server.selected").attr("data-address");
+	selectedServer = $(".server.selected").data("address");
 
 	$("#server-grid").empty();
 	$("#count").text("Loading servers...");
@@ -783,7 +783,7 @@ function toggleFavoriteServer(element) {
 
 	chrome.storage.sync.set({ favorites: settings.favorites });
 
-	if (["favorites", "friendsFavorites"].includes(settings.badgeValue)) {
+	if (settings.badgeValue == "favorites") {
 		background.updateBadge();
 	}
 
@@ -816,7 +816,7 @@ function toggleFriend(element) {
 
 	chrome.storage.sync.set({ friends: settings.friends });
 
-	if (["friendsAll", "friendsFavorites"].includes(settings.badgeValue)) {
+	if (settings.badgeValue === "friends") {
 		background.updateBadge();
 	}
 

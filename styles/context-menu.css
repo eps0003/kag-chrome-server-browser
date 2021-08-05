@@ -1,0 +1,17 @@
+#context-menu {
+	position: absolute;
+	z-index: 1000;
+	transform: scale(0);
+	opacity: 0;
+	pointer-events: none;
+	transform-origin: top left;
+	transition: transform 0.2s, opacity 0.2s;
+}
+
+#context-menu .button {
+	padding: 8px 20px;
+}
+
+#context-menu .button:not(:last-of-type) {
+	margin-bottom: -2px;
+}
