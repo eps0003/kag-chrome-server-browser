@@ -429,7 +429,7 @@ function getSelectedServer() {
 
 function joinServer() {
 	const address = $("#play").data("address");
-	let url = `kag://${address}/`;
+	let url = `kag://${address}`;
 
 	if ($(".server.selected").hasClass("locked")) {
 		const password = prompt("Enter server password");
