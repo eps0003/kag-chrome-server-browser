@@ -145,17 +145,21 @@ $(function () {
 function scrollUpList(e) {
 	let server;
 
-	if (e.ctrlKey && e.shiftKey && $(".server.favorite:visible").length) {
-		//first favorite
-		server = $(".server:visible.favorite:first");
+	if (e.ctrlKey && e.shiftKey) {
+		if ($(".server.favorite:visible").length) {
+			//first favorite
+			server = $(".server:visible.favorite:first");
+		}
 	} else if (e.shiftKey) {
 		//first server
 		server = $(".server:visible:first");
-	} else if (e.ctrlKey && $(".server.favorite:visible").length) {
-		//prev favorite
-		server = $(".server.selected").prevAll(".favorite:visible:first");
-		if (!$(server).length) {
-			server = $(".server.favorite:visible:last");
+	} else if (e.ctrlKey) {
+		if ($(".server.favorite:visible").length) {
+			//prev favorite
+			server = $(".server.selected").prevAll(".favorite:visible:first");
+			if (!$(server).length) {
+				server = $(".server.favorite:visible:last");
+			}
 		}
 	} else {
 		//prev server
@@ -172,17 +176,21 @@ function scrollUpList(e) {
 function scrollDownList(e) {
 	let server;
 
-	if (e.ctrlKey && e.shiftKey && $(".server.favorite:visible").length) {
-		//last favorite
-		server = $(".server:visible.favorite:last");
+	if (e.ctrlKey && e.shiftKey) {
+		if ($(".server.favorite:visible").length) {
+			//last favorite
+			server = $(".server:visible.favorite:last");
+		}
 	} else if (e.shiftKey) {
 		//last server
 		server = $(".server:visible:last");
-	} else if (e.ctrlKey && $(".server.favorite:visible").length) {
-		//next favorite
-		server = $(".server.selected").nextAll(".favorite:visible:first");
-		if (!$(server).length) {
-			server = $(".server.favorite:visible:first");
+	} else if (e.ctrlKey) {
+		if ($(".server.favorite:visible").length) {
+			//next favorite
+			server = $(".server.selected").nextAll(".favorite:visible:first");
+			if (!$(server).length) {
+				server = $(".server.favorite:visible:first");
+			}
 		}
 	} else {
 		//next server
@@ -197,6 +205,8 @@ function scrollDownList(e) {
 }
 
 function scrollToServer(element) {
+	if (!$(element).length) return;
+
 	let container = $("#server-list");
 	let scrollTop = $(container).scrollTop() + $(element).position().top - $(container).height() / 2 + 4;
 	container.stop().animate({ scrollTop }, 300, "easeOutQuart");
