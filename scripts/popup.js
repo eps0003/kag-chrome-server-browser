@@ -328,7 +328,7 @@ function updateServers() {
 		//verified
 		if (server.modsVerified) {
 			const verifiedIcon = element.find(".verified-icon");
-			verifiedIcon.css("background-image", "url(images/server_verified.png)");
+			element.addClass("verified");
 			verifiedIcon.attr("title", `Verified Mods`);
 		}
 
@@ -369,7 +369,35 @@ function updateServers() {
 		e.stopPropagation();
 	});
 
-	$(".server .favorite-icon").dblclick(function (e) {
+	$(".server .flag").click(function (e) {
+		if (isDragging("#server-list")) return;
+		filterServersByCountry(this);
+		scrollToServer(getSelectedServer());
+		e.stopPropagation();
+	});
+
+	$(".server .gamemode-icon").click(function (e) {
+		if (isDragging("#server-list")) return;
+		filterServersByGamemode(this);
+		scrollToServer(getSelectedServer());
+		e.stopPropagation();
+	});
+
+	$(".server .players-icon").click(function (e) {
+		if (isDragging("#server-list") || $(this).parent().hasClass("empty")) return;
+		filterEmptyServers();
+		scrollToServer(getSelectedServer());
+		e.stopPropagation();
+	});
+
+	$(".server .password-icon").click(function () {
+		if (isDragging("#server-list") || !$(this).parent().hasClass("locked")) return;
+		filterLockedServers();
+		scrollToServer(getSelectedServer());
+		e.stopPropagation();
+	});
+
+	$(".server *").dblclick(function (e) {
 		e.stopPropagation();
 	});
 }
@@ -394,6 +422,8 @@ function updateServerPlayersIcon(element, server) {
 	if (server.currentPlayers > 0) {
 		const friendCount = friendsOnline ? ` (${friendsOnline})` : "";
 		playersIcon.attr("title", `${server.currentPlayers}/${server.maxPlayers}${friendCount}`);
+	} else {
+		$(element).addClass("empty");
 	}
 }
 

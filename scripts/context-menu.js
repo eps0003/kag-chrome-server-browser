@@ -190,16 +190,7 @@ function createLockedContextMenu() {
 	let element = initContextMenu();
 
 	addContextButton(element, "Filter locked", function () {
-		if ($("#password").attr("data-value") != 2) {
-			settings.passwordButton = 2;
-		} else {
-			settings.passwordButton = 0;
-		}
-
-		$("#password").attr("data-value", settings.passwordButton);
-		chrome.storage.sync.set({ passwordButton: settings.passwordButton });
-
-		filterServers();
+		filterLockedServers();
 	});
 
 	addContextButton(element, "Filter unlocked", function () {
@@ -216,6 +207,19 @@ function createLockedContextMenu() {
 	});
 
 	setupContextMenu(element);
+}
+
+function filterLockedServers() {
+	if ($("#password").attr("data-value") != 2) {
+		settings.passwordButton = 2;
+	} else {
+		settings.passwordButton = 0;
+	}
+
+	$("#password").attr("data-value", settings.passwordButton);
+	chrome.storage.sync.set({ passwordButton: settings.passwordButton });
+
+	filterServers();
 }
 
 function createPlayerCountContextMenu() {
@@ -244,18 +248,7 @@ function createPlayerCountContextMenu() {
 	});
 
 	addContextButton(element, "Filter empty servers", function () {
-		var index = settings.sliderValues.indexOf(Math.min(...settings.sliderValues));
-
-		if (settings.sliderValues[index] !== 1) {
-			settings.sliderValues[index] = 1;
-		} else {
-			settings.sliderValues[index] = 0;
-		}
-
-		$("#slider").slider({ values: settings.sliderValues });
-		chrome.storage.sync.set({ sliderValues: settings.sliderValues });
-
-		filterServers();
+		filterEmptyServers();
 	});
 
 	addContextButton(element, "Filter full servers", function () {
@@ -274,6 +267,21 @@ function createPlayerCountContextMenu() {
 	});
 
 	setupContextMenu(element);
+}
+
+function filterEmptyServers() {
+	var index = settings.sliderValues.indexOf(Math.min(...settings.sliderValues));
+
+	if (settings.sliderValues[index] !== 1) {
+		settings.sliderValues[index] = 1;
+	} else {
+		settings.sliderValues[index] = 0;
+	}
+
+	$("#slider").slider({ values: settings.sliderValues });
+	chrome.storage.sync.set({ sliderValues: settings.sliderValues });
+
+	filterServers();
 }
 
 function createMinimapContextMenu(minimap) {
@@ -304,17 +312,7 @@ function createCountryContextMenu(server) {
 
 	addContextButton(element, "Filter this country", function () {
 		let flag = $(server).children(".flag");
-		let search = $("#search").val();
-		let country = $(flag).attr("title");
-		let regex = new RegExp(`\\b${country}\\b\\s?`, "gi");
-
-		if (search.match(regex)) {
-			$("#search").val(search.replace(regex, ""));
-		} else {
-			$("#search").val(`${search.trimEnd()} ${country}`);
-		}
-
-		filterServers();
+		filterServersByCountry(flag);
 	});
 
 	addContextButton(element, "Hide flags", function () {
@@ -324,6 +322,20 @@ function createCountryContextMenu(server) {
 	});
 
 	setupContextMenu(element);
+}
+
+function filterServersByCountry(flag) {
+	let search = $("#search").val();
+	let country = $(flag).attr("title");
+	let regex = new RegExp(`\\s?\\b${country}\\b`, "gi");
+
+	if (search.match(regex)) {
+		$("#search").val(search.replace(regex, "").trim());
+	} else {
+		$("#search").val(`${search.trimEnd()} ${country}`.trim());
+	}
+
+	filterServers();
 }
 
 function createGamemodeContextMenu(server) {
@@ -343,18 +355,23 @@ function createGamemodeContextMenu(server) {
 	});
 
 	addContextButton(contextMenu, "Filter this gamemode", function () {
-		let gamemode = $(server).children(".gamemode-icon").attr("title");
-
-		if ($("#gamemodes").val() !== gamemode) {
-			$("#gamemodes").val(gamemode);
-		} else {
-			$("#gamemodes").val("All");
-		}
-
-		filterServers();
+		let gamemodeIcon = $(server).children(".gamemode-icon");
+		filterServersByGamemode(gamemodeIcon);
 	});
 
 	setupContextMenu(contextMenu);
+}
+
+function filterServersByGamemode(gamemodeIcon) {
+	let gamemode = $(gamemodeIcon).attr("title");
+
+	if ($("#gamemodes").val() !== gamemode) {
+		$("#gamemodes").val(gamemode);
+	} else {
+		$("#gamemodes").val("All");
+	}
+
+	filterServers();
 }
 
 function createHeaderContextMenu() {

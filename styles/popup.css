@@ -247,6 +247,7 @@ a:hover {
 .server .flag {
 	grid-area: flag;
 	margin: auto 0 auto 10px;
+	cursor: pointer;
 }
 
 .server .name {
@@ -258,16 +259,29 @@ a:hover {
 	grid-area: verified;
 }
 
+.server.verified .verified-icon {
+	background-image: url(../images/server_verified.png);
+}
+
 .server .players-icon {
 	grid-area: players;
 }
 
+.server:not(.empty) .players-icon {
+	cursor: pointer;
+}
+
 .server .gamemode-icon {
 	grid-area: gamemode;
+	cursor: pointer;
 }
 
 .server .password-icon {
 	grid-area: password;
+}
+
+.server.locked .password-icon {
+	cursor: pointer;
 }
 
 /* SERVER INFO GRID */
