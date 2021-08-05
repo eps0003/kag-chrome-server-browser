@@ -682,22 +682,32 @@ function updateServerInfo() {
 
 	updatePlayerList(server);
 
-	//minimap
-	getMinimap(server, function (img) {
-		if ($(img).data("address") !== $(".server.selected").data("address")) return;
-		$("#minimap img").replaceWith(img);
+	if (server.minimap) {
+		setMinimap(server.minimap);
+	} else {
+		getMinimap(server, function (img) {
+			server.minimap = img;
 
-		let divW = $("#minimap").width();
-		let divH = $("#minimap").height();
-		let imgW = $(img).width();
-		let imgH = $(img).height();
+			if ($(img).data("address") === $(".server.selected").data("address")) {
+				setMinimap(img);
+			}
+		});
+	}
+}
 
-		//scroll or move minimap to center depending on size compared to container
-		$("#minimap").scrollLeft((imgW - divW) / 2);
-		$("#minimap").scrollTop((imgH - divH) / 2);
-		if (divW > imgW) $(img).css("left", (divW - imgW) / 2);
-		if (divH > imgH) $(img).css("top", (divH - imgH) / 2);
-	});
+function setMinimap(image) {
+	$("#minimap img").replaceWith(image);
+
+	let divW = $("#minimap").width();
+	let divH = $("#minimap").height();
+	let imgW = $(image).width();
+	let imgH = $(image).height();
+
+	//scroll or move minimap to center depending on size compared to container
+	$("#minimap").scrollLeft((imgW - divW) / 2);
+	$("#minimap").scrollTop((imgH - divH) / 2);
+	if (divW > imgW) $(image).css("left", (divW - imgW) / 2);
+	if (divH > imgH) $(image).css("top", (divH - imgH) / 2);
 }
 
 function updatePlayerList(server) {
