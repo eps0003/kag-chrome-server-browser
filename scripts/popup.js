@@ -92,9 +92,115 @@ $(function () {
 			chrome.runtime.openOptionsPage();
 		});
 
+		$(document).keydown(function (e) {
+			if ((e.ctrlKey && e.key === "r") || e.key === "F5") {
+				$("#reload").click();
+			} else if (e.key === "Enter") {
+				$("#play").click();
+			} else if (e.ctrlKey && e.key === "m") {
+				$("#modded").click();
+			} else if (e.ctrlKey && e.key === "p") {
+				$("#password").click();
+			} else if (e.ctrlKey && e.key === "o") {
+				$("#officials").click();
+			} else if (e.ctrlKey && e.key === "f") {
+				$("#favorites").click();
+			} else if (e.ctrlKey && e.key === " ") {
+				toggleFavoriteServer(".server.selected");
+			} else if (e.key === "Tab") {
+				//cycle through sort options
+				if (e.shiftKey) {
+					//previous sort option
+					if ($("#sort option:selected").prop("index") === 0) {
+						//doesnt auto loop like .next() does for some reason
+						$("#sort option:selected").prop("selected", false);
+						$("#sort option:last").prop("selected", true);
+					} else {
+						$("#sort option:selected").prop("selected", false).prev().prop("selected", true);
+					}
+				} else {
+					//next sort option
+					$("#sort option:selected").prop("selected", false).next().prop("selected", true);
+				}
+
+				sortServers();
+			} else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+				scrollUpList(e);
+			} else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+				scrollDownList(e);
+			} else if (!$(".modal input").is(":focus")) {
+				$("#search").focus();
+				return;
+			} else {
+				return;
+			}
+
+			e.preventDefault();
+		});
+
 		reloadServers();
 	});
 });
+
+function scrollUpList(e) {
+	let server;
+
+	if (e.ctrlKey && e.shiftKey && $(".server.favorite:visible").length) {
+		//first favorite
+		server = $(".server:visible.favorite:first");
+	} else if (e.shiftKey) {
+		//first server
+		server = $(".server:visible:first");
+	} else if (e.ctrlKey && $(".server.favorite:visible").length) {
+		//prev favorite
+		server = $(".server.selected").prevAll(".favorite:visible:first");
+		if (!$(server).length) {
+			server = $(".server.favorite:visible:last");
+		}
+	} else {
+		//prev server
+		server = $(".server.selected").prevAll(":visible:first");
+		if (!$(server).length) {
+			server = $(".server:visible:last");
+		}
+	}
+
+	selectServer(server);
+	scrollToServer(server);
+}
+
+function scrollDownList(e) {
+	let server;
+
+	if (e.ctrlKey && e.shiftKey && $(".server.favorite:visible").length) {
+		//last favorite
+		server = $(".server:visible.favorite:last");
+	} else if (e.shiftKey) {
+		//last server
+		server = $(".server:visible:last");
+	} else if (e.ctrlKey && $(".server.favorite:visible").length) {
+		//next favorite
+		server = $(".server.selected").nextAll(".favorite:visible:first");
+		if (!$(server).length) {
+			server = $(".server.favorite:visible:first");
+		}
+	} else {
+		//next server
+		server = $(".server.selected").nextAll(":visible:first");
+		if (!$(server).length) {
+			server = $(".server:visible:first");
+		}
+	}
+
+	selectServer(server);
+	scrollToServer(server);
+}
+
+function scrollToServer(element) {
+	let container = $("#server-list");
+	let scrollTop = $(container).scrollTop() + $(element).position().top - $(container).height() / 2 + 4;
+	container.stop().animate({ scrollTop }, 300, "easeOutQuart");
+}
 
 function isDragging(element) {
 	return $(element).hasClass("dragging");
@@ -711,4 +817,10 @@ function setDefaults() {
 	$("#favorites").attr("data-value", settings.favoritesButton);
 	$("#min-players").text(Math.min(...settings.sliderValues) + "%");
 	$("#max-players").text(Math.max(...settings.sliderValues) + "%");
+
+	if (settings.drag) {
+		$("#server-list").addClass("dragscroll");
+		$("#info").addClass("dragscroll");
+		dragscroll.reset();
+	}
 }
