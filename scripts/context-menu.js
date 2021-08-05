@@ -433,6 +433,14 @@ function createServerContextMenu(server) {
 		toggleFavoriteServer(server);
 	});
 
+	if ($(server).hasClass("outdated")) {
+		addContextButton(element, "Hide outdated", function () {
+			settings.displayOutdatedServers = false;
+			chrome.storage.sync.set({ displayOutdatedServers: settings.displayOutdatedServers });
+			filterServers();
+		});
+	}
+
 	setupContextMenu(element);
 }
 
