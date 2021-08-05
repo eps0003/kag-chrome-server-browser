@@ -239,13 +239,13 @@ function updateServers() {
 		$("#play").click();
 	});
 
-	$(".server .favorite-icon").click(function () {
+	$(".server .favorite-icon").click(function (e) {
 		toggleFavoriteServer($(this).parent());
-		event.stopPropagation();
+		e.stopPropagation();
 	});
 
-	$(".server .favorite-icon").dblclick(function () {
-		event.stopPropagation();
+	$(".server .favorite-icon").dblclick(function (e) {
+		e.stopPropagation();
 	});
 }
 
