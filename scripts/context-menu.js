@@ -14,9 +14,9 @@ $(function () {
 					createFavoriteContextMenu(server);
 				} else if ($(e.target).hasClass("flag")) {
 					createCountryContextMenu(server);
-				} else if ($(e.target).hasClass("players-icon")) {
+				} else if ($(e.target).hasClass("players-icon") && !server.hasClass("empty")) {
 					createPlayerCountContextMenu();
-				} else if ($(e.target).hasClass("password-icon")) {
+				} else if ($(e.target).hasClass("password-icon") && server.hasClass("locked")) {
 					createLockedContextMenu();
 				} else if ($(e.target).parent().hasClass("name")) {
 					createServerNameContextMenu();
