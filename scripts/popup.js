@@ -15,7 +15,7 @@ $(function () {
 				`Thanks for installing my extension! I hope it will be useful to you.`,
 				`Be sure to leave a review on the <a href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">store page</a> and share it with others.`,
 				`The extension is open source on <a href="https://github.com/eps0003/kag-chrome-server-browser" target="_blank">GitHub</a>. Feel free to contribute or leave feedback and suggestions.`,
-				// `Please consider donating to me through <a href="" target="_blank">PayPal</a>.`
+				`Please consider supporting my work by <a href="https://buymeacoffee.com/epsilul" target="_blank">buying me a coffee</a>.`,
 			];
 			InfoModal("install-modal", "KAG Server List", text.join("<br /><br />"), 500);
 		} else if (background.displayMessage === "update") {
@@ -26,7 +26,7 @@ $(function () {
 				`You can view a full changelog on the <a href="https://forum.thd.vg/threads/27522" target="_blank">forum thread</a>.`,
 				`Be sure to leave a review on the <a href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">store page</a> and share it with others.`,
 				`The extension is now open source on <a href="https://github.com/eps0003/kag-chrome-server-browser" target="_blank">GitHub</a>. Feel free to contribute or leave feedback and suggestions.`,
-				// `Please consider donating to me through <a href="" target="_blank">PayPal</a>.`
+				`Please consider supporting my work by <a href="https://buymeacoffee.com/epsilul" target="_blank">buying me a coffee</a>.`,
 			];
 			InfoModal("update-modal", "Extension update", text.join("<br /><br />"), 500);
 		}
