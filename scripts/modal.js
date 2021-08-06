@@ -74,9 +74,24 @@ function initModal(element) {
 		handle: ".modal-handle",
 	});
 
-	//hide modal when close button is clicked
-	element.find(".modal-close").click(function (e) {
-		closeModal(element);
+	element.find(".modal-close").click(function () {
+		element.addClass("closed");
+
+		//hide modal
+		element.css({
+			transform: "scale(0)",
+			opacity: 0,
+			"pointer-events": "none",
+		});
+
+		element.each((i, ele) => {
+			//delete modal when completely hidden
+			//ensure the ms is the same as in css
+			setTimeout(() => ele.remove(), 200);
+		});
+
+		//unfocus everything
+		$("*").blur();
 	});
 
 	//bring modal to front when clicked
@@ -115,26 +130,7 @@ function bringModalToFront(element) {
 }
 
 function closeModal(element) {
-	element = $(element);
-	if (!element.length) return;
-
-	element.addClass("closed");
-
-	//hide modal
-	element.css({
-		transform: "scale(0)",
-		opacity: 0,
-		"pointer-events": "none",
-	});
-
-	element.each((i, ele) => {
-		//delete modal when completely hidden
-		//ensure the ms is the same as in css
-		setTimeout(() => ele.remove(), 200);
-	});
-
-	//unfocus everything
-	$("*").blur();
+	$(element).find(".modal-close").click();
 }
 
 function closeTopmostModal() {
