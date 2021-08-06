@@ -55,7 +55,7 @@ function updateBadge() {
 
 			if (badgeValue === "favorites") {
 				players = countPlayersInServer(favoriteServers);
-			} else if (badgeValue === "friendsAll") {
+			} else if (badgeValue === "friends") {
 				players = countPlayersInServer(servers, friends);
 			} else if (badgeValue === "friendsFavorites") {
 				players = countPlayersInServer(favoriteServers, friends);

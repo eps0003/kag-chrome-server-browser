@@ -869,7 +869,7 @@ function toggleFavoriteServer(element) {
 
 	chrome.storage.sync.set({ favorites: settings.favorites });
 
-	if (settings.badgeValue == "favorites") {
+	if (settings.badgeValue === "favorites" || settings.badgeValue === "friendsFavorites") {
 		background.updateBadge();
 	}
 
@@ -902,7 +902,7 @@ function toggleFriend(element) {
 
 	chrome.storage.sync.set({ friends: settings.friends });
 
-	if (settings.badgeValue === "friends") {
+	if (settings.badgeValue === "friends" || settings.badgeValue === "friendsFavorites") {
 		background.updateBadge();
 	}
 
