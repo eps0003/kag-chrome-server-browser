@@ -22,7 +22,7 @@ $(function () {
 			let text = [
 				//
 				`Thanks for using my extension! I hope it's been useful to you.`,
-				`The extension has been rewritten from scratch. As a result, you may need to reset your settings from the options menu for the extension to work properly.`,
+				`The extension has been rewritten from scratch. As a result, you will most likely need to reset your settings from the options menu for the extension to work properly.`,
 				`You can view a full changelog on the <a href="https://forum.thd.vg/threads/27522/page-2#post-408064" target="_blank">forum thread</a>.`,
 				`Be sure to leave a review on the <a href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">store page</a> and share it with others.`,
 				`The extension is now open source on <a href="https://github.com/eps0003/kag-chrome-server-browser" target="_blank">GitHub</a>. Feel free to contribute or leave feedback and suggestions.`,
@@ -80,7 +80,7 @@ $(function () {
 			if ($(this).hasClass("disabled")) return;
 
 			if (settings.buttonVolume) {
-				const audio = new Audio("audio/menuclick.ogg");
+				const audio = new Audio("../audio/menuclick.ogg");
 				audio.currentTime = 0;
 				audio.volume = settings.buttonVolume / 100;
 				audio.play();
@@ -340,7 +340,7 @@ function updateServers() {
 			element.addClass("locked");
 
 			const passwordIcon = element.find(".password-icon");
-			passwordIcon.css("background-image", "url(images/server_locked.png)");
+			passwordIcon.css("background-image", "url(../images/server_locked.png)");
 			passwordIcon.attr("title", "Locked");
 		}
 
@@ -355,19 +355,19 @@ function updateServers() {
 		gamemodeIcon.attr("title", server.gameMode);
 
 		if (server.gameMode.match(/ctf|capture the flag/gi)) {
-			gamemodeIcon.css("background-image", "url(images/server_ctf.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_ctf.png)");
 		} else if (server.gameMode.match(/tdm|team deathmatch/gi)) {
-			gamemodeIcon.css("background-image", "url(images/server_tdm.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_tdm.png)");
 		} else if (server.gameMode === "TTH") {
-			gamemodeIcon.css("background-image", "url(images/server_tth.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_tth.png)");
 		} else if (server.gameMode === "Challenge") {
-			gamemodeIcon.css("background-image", "url(images/server_challenge.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_challenge.png)");
 		} else if (server.gameMode === "Sandbox") {
-			gamemodeIcon.css("background-image", "url(images/server_sandbox.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_sandbox.png)");
 		} else if (server.gameMode.match(/zombie|zf/gi)) {
-			gamemodeIcon.css("background-image", "url(images/server_zombies.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_zombies.png)");
 		} else {
-			gamemodeIcon.css("background-image", "url(images/server_unknown.png)");
+			gamemodeIcon.css("background-image", "url(../images/server_unknown.png)");
 		}
 
 		updateServerPlayersIcon(element, server);
@@ -459,11 +459,11 @@ function updateServerPlayersIcon(element, server) {
 
 	if (server.playerPercentage >= 1) {
 		const friendsIndex = Math.min(friendsOnline, 1);
-		playersIcon.css("background-image", `url(images/server_full_${friendsIndex}.png)`);
+		playersIcon.css("background-image", `url(../images/server_full_${friendsIndex}.png)`);
 	} else if (server.playerPercentage > 0) {
 		const index = Math.min(3, Math.ceil(server.playerPercentage * 3));
 		const friendsIndex = Math.min(Math.ceil(friendsPercentage * 3), 3);
-		playersIcon.css("background-image", `url(images/server_players_${index}${friendsIndex}.png)`);
+		playersIcon.css("background-image", `url(../images/server_players_${index}${friendsIndex}.png)`);
 	}
 
 	if (server.currentPlayers > 0) {
