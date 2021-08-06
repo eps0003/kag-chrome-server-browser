@@ -8,6 +8,34 @@ const REGEX_WEBSITE = /\b((?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|1
 const REGEX_EMAIL = /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/gi;
 
 $(function () {
+	if (background.displayMessage) {
+		if (background.displayMessage === "install") {
+			let text = [
+				//
+				`Thanks for installing my extension! I hope it will be useful to you.`,
+				`Be sure to leave a review on the <a href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">store page</a> and share it with others.`,
+				`The extension is open source on <a href="https://github.com/eps0003/kag-chrome-server-browser" target="_blank">GitHub</a>. Feel free to contribute or leave feedback and suggestions.`,
+				// `Please consider donating to me through <a href="" target="_blank">PayPal</a>.`
+			];
+			InfoModal("install-modal", "KAG Server List", text.join("<br /><br />"), 500);
+		} else if (background.displayMessage === "update") {
+			let text = [
+				//
+				`Thanks for using my extension! I hope it's been useful to you.`,
+				`The extension has been rewritten from scratch. As a result, you may need to reset your settings from the options menu for the extension to work properly.`,
+				`You can view a full changelog on the <a href="https://forum.thd.vg/threads/27522/page-2#post-408064" target="_blank">forum thread</a>.`,
+				`Be sure to leave a review on the <a href="https://chrome.google.com/webstore/detail/aipcclcgemecihikpdgfoonlfpjkekmp" target="_blank">store page</a> and share it with others.`,
+				`The extension is now open source on <a href="https://github.com/eps0003/kag-chrome-server-browser" target="_blank">GitHub</a>. Feel free to contribute or leave feedback and suggestions.`,
+				// `Please consider donating to me through <a href="" target="_blank">PayPal</a>.`
+			];
+			InfoModal("update-modal", "Extension update", text.join("<br /><br />"), 500);
+		}
+
+		$(".modal-close").click(function () {
+			background.displayMessage = null;
+		});
+	}
+
 	chrome.storage.sync.get(null, function (data) {
 		settings = data;
 

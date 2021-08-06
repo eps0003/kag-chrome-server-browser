@@ -43,6 +43,7 @@
 .modal-header {
 	grid-area: header;
 	line-height: 21px;
+	color: rgb(19, 13, 29) !important;
 }
 
 .modal-close {

@@ -1,4 +1,5 @@
-let servers;
+var servers;
+var displayMessage;
 let previousPlayers = {};
 
 chrome.runtime.onInstalled.addListener(function (details) {
@@ -9,6 +10,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
 		const prevVersion = details.previousVersion;
 		updatedExtension(prevVersion, thisVersion);
 	}
+
+	displayMessage = details.reason;
 });
 
 function installedExtension(version) {
