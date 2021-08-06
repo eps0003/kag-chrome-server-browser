@@ -640,7 +640,7 @@ function joinServer() {
 		let password = settings.passwords[address];
 		PasswordModal(`password-modal-${getIDFromIP(address)}`, password);
 	} else {
-		window.open(`kag://${address}`);
+		window.location = "kag://" + address;
 	}
 }
 

@@ -36,7 +36,7 @@ function PasswordModal(id, password, width = 0) {
 			}
 
 			//open kag with password
-			window.open(`kag://${address}/${password}`);
+			window.location = `kag://${address}/${password}`;
 		});
 
 	//initialise modal

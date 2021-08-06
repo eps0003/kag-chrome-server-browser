@@ -124,7 +124,7 @@ function processNotifications() {
 chrome.notifications.onClicked.addListener((id) => {
 	chrome.storage.sync.get("notificationClick", ({ notificationClick }) => {
 		if (notificationClick) {
-			window.open("kag://" + id);
+			open("kag://" + id);
 		}
 	});
 });
