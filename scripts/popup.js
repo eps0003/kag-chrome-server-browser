@@ -606,10 +606,11 @@ function getIDFromIP(ip) {
 }
 
 function joinServer() {
-	const address = $("#play").data("address");
+	const address = $(".server.selected").data("address");
 
 	if ($(".server.selected").hasClass("locked")) {
-		PasswordModal(`password-modal-${getIDFromIP(address)}`);
+		let password = settings.passwords[address];
+		PasswordModal(`password-modal-${getIDFromIP(address)}`, password);
 	} else {
 		window.open(`kag://${address}`);
 	}
@@ -710,10 +711,8 @@ function selectServer(element) {
 	//enable play button
 	if (!$(element).hasClass("outdated")) {
 		$("#play").removeClass("disabled");
-		$("#play").attr("data-address", $(element).data("address"));
 	} else {
 		$("#play").addClass("disabled");
-		$("#play").removeData("address");
 	}
 }
 

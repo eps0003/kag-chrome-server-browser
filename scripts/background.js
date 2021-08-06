@@ -95,10 +95,14 @@ function processNotifications() {
 		if (notifications.length) {
 			notifications.sort((a, b) => b.currentPlayers - a.currentPlayers);
 
-			chrome.notifications.create(notifications[0].address, {
+			let id = notifications[0].address;
+			let password = settings.passwords[fav];
+			if (password) id += `/${password}`;
+
+			chrome.notifications.create(id, {
 				type: "list",
 				title: "KAG Server Browser",
-				message: "test",
+				message: "",
 				items: notifications.map((x) => ({ title: `${x.currentPlayers}/${x.maxPlayers}`, message: x.name })),
 				iconUrl: "images/kag_icon_128.png",
 				silent: true,
@@ -140,7 +144,7 @@ function loop() {
 		.catch(errorReceivingServers);
 
 	chrome.storage.sync.get("refreshInterval", ({ refreshInterval }) => {
-		const ms = 1000 * refreshInterval;
+		const ms = 60000 * refreshInterval;
 		const delay = ms - (new Date() % ms);
 		setTimeout(loop, delay);
 	});
@@ -150,6 +154,7 @@ function getDefaultSettings() {
 	return {
 		favorites: [],
 		friends: [],
+		passwords: {},
 
 		sortDropdown: "count",
 

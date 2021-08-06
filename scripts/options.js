@@ -55,6 +55,7 @@ $(function () {
 
 	$("input, select").on("input", function () {
 		$("#resetAll").prop("disabled", false);
+		$("#resetAll").removeData("clicks");
 		$("#resetAll").text("Reset everything!");
 	});
 
@@ -70,6 +71,13 @@ $(function () {
 
 		$(this).prop("disabled", true);
 		$(this).text("Friends cleared");
+	});
+
+	$("#clearPasswords").click(function () {
+		chrome.storage.sync.set({ passwords: {} });
+
+		$(this).prop("disabled", true);
+		$(this).text("Passwords cleared");
 	});
 
 	$("#resetAll").click(async function () {
@@ -147,6 +155,7 @@ function setDefaults() {
 
 	$("#clearFavorites").prop("disabled", !settings.favorites.length);
 	$("#clearFriends").prop("disabled", !settings.friends.length);
+	$("#clearPasswords").prop("disabled", jQuery.isEmptyObject(settings.passwords));
 	$("#resetAll").prop("disabled", areSettingsDefault());
 }
 

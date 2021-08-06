@@ -16,17 +16,17 @@ function PasswordModal(id, password, width = 0) {
 			if ($(server).hasClass("outdated")) return;
 
 			//get required info
-			let ip = $(server).data("address");
+			let address = $(server).data("address");
 			let password = $(element).find("input").val();
 
-			// //remove saved password if textbox is empty
-			// if (!password) {
-			// 	delete settings.passwords[$(server).attr("id")];
-			// } else {
-			// 	settings.passwords[$(server).attr("id")] = password;
-			// }
+			//remove saved password if textbox is empty
+			if (password) {
+				settings.passwords[address] = password;
+			} else {
+				delete settings.passwords[address];
+			}
 
-			//update saved passwords
+			//update saved password
 			chrome.storage.sync.set({ passwords: settings.passwords });
 
 			//close modal if no password was entered
@@ -36,7 +36,7 @@ function PasswordModal(id, password, width = 0) {
 			}
 
 			//open kag with password
-			window.open(`kag://${ip}/${password}`);
+			window.open(`kag://${address}/${password}`);
 		});
 
 	//initialise modal
