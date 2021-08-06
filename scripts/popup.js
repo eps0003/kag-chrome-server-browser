@@ -38,7 +38,7 @@ $(function () {
 
 		$(document).keydown(function (e) {
 			if (e.key === "Escape") {
-				if ($("#context-menu").length) {
+				if (isContextMenuVisible()) {
 					e.preventDefault();
 					closeContextMenu();
 				} else if (isModalOpen()) {
@@ -230,10 +230,11 @@ function scrollDownList(e) {
 }
 
 function scrollToServer(element) {
-	if (!$(element).length) return;
+	element = $(element);
+	if (!element.length || element.is(":hidden")) return;
 
 	let container = $("#server-list");
-	let scrollTop = $(container).scrollTop() + $(element).position().top - $(container).height() / 2 + 4;
+	let scrollTop = $(container).scrollTop() + element.position().top - $(container).height() / 2 + 4;
 	container.stop().animate({ scrollTop }, 300, "easeOutQuart");
 }
 
