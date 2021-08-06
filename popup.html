@@ -4,12 +4,14 @@
 		<title>KAG Server Browser</title>
 		<link rel="stylesheet" type="text/css" href="styles/popup.css" />
 		<link rel="stylesheet" type="text/css" href="styles/context-menu.css" />
+		<link rel="stylesheet" type="text/css" href="styles/modal.css" />
 		<link rel="stylesheet" type="text/css" href="libraries/jquery-ui.min.css" />
 		<link rel="stylesheet" type="text/css" href="libraries/flags.css" />
 		<script type="text/javascript" src="libraries/jquery.min.js"></script>
 		<script type="text/javascript" src="libraries/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="libraries/dragscroll.js"></script>
 		<script type="text/javascript" src="scripts/context-menu.js"></script>
+		<script type="text/javascript" src="scripts/modal.js"></script>
 		<script type="text/javascript" src="scripts/popup.js"></script>
 		<script type="text/javascript" src="scripts/utilities.js"></script>
 	</head>
@@ -23,6 +25,25 @@
 				<div class="players-icon"></div>
 				<div class="gamemode-icon"></div>
 				<div class="password-icon"></div>
+			</div>
+		</template>
+
+		<template id="password-modal">
+			<div class="modal password-modal container">
+				<div class="modal-handle"></div>
+				<span class="modal-header">Enter server password</span>
+				<input type="text" spellcheck="false" class="indented" />
+				<div class="modal-ok button">OK</div>
+				<div class="modal-close button">&#10006;</div>
+			</div>
+		</template>
+
+		<template id="info-modal">
+			<div class="modal info-modal container">
+				<div class="modal-handle"></div>
+				<span class="modal-header"></span>
+				<span class="modal-content"></span>
+				<div class="modal-close button">&#10006;</div>
 			</div>
 		</template>
 

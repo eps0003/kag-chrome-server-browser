@@ -36,6 +36,18 @@ $(function () {
 			},
 		});
 
+		$(document).keydown(function (e) {
+			if (e.key === "Escape") {
+				if ($("#context-menu").length) {
+					e.preventDefault();
+					closeContextMenu();
+				} else if (isModalOpen()) {
+					e.preventDefault();
+					closeTopmostModal();
+				}
+			}
+		});
+
 		$(document).on("click", ".button", function () {
 			if ($(this).hasClass("disabled")) return;
 
@@ -99,7 +111,13 @@ $(function () {
 				if ((e.ctrlKey && e.key === "r") || e.key === "F5") {
 					$("#reload").click();
 				} else if (e.key === "Enter") {
-					$("#play").click();
+					if ($(".modal input").is(":focus")) {
+						//click modal ok button
+						$(":focus").siblings(".modal-ok").click();
+					} else {
+						//click play button
+						$("#play").click();
+					}
 				} else if (e.ctrlKey && e.key === "m") {
 					$("#modded").click();
 				} else if (e.ctrlKey && e.key === "p") {
@@ -582,17 +600,18 @@ function getSelectedServer() {
 	return $(".server.selected");
 }
 
+function getIDFromIP(ip) {
+	return ip.replace(/\./g, "-").replace(":", "_");
+}
+
 function joinServer() {
 	const address = $("#play").data("address");
-	let url = `kag://${address}`;
 
 	if ($(".server.selected").hasClass("locked")) {
-		const password = prompt("Enter server password");
-		if (!password) return;
-		url += password;
+		PasswordModal(`password-modal-${getIDFromIP(address)}`);
+	} else {
+		window.open(`kag://${address}`);
 	}
-
-	window.open(url);
 }
 
 function getServerData(element) {
@@ -675,6 +694,8 @@ function sortServerCountry(a, b) {
 
 function selectServer(element) {
 	if (!$(element).length || isServerSelected(element)) return;
+
+	closeModal(".password-modal");
 
 	//select server
 	$(".server").removeClass("selected");
