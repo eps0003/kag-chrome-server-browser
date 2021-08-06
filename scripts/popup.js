@@ -390,7 +390,7 @@ function updateServers() {
 		e.stopPropagation();
 	});
 
-	$(".server .password-icon").click(function () {
+	$(".server .password-icon").click(function (e) {
 		if (isDragging("#server-list") || !$(this).parent().hasClass("locked")) return;
 		filterLockedServers();
 		scrollToServer(getSelectedServer());
