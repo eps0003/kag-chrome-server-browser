@@ -173,9 +173,9 @@ $(function () {
 					}
 
 					sortServers();
-				} else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+				} else if (e.key === "ArrowUp") {
 					scrollUpList(e);
-				} else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+				} else if (e.key === "ArrowDown") {
 					scrollDownList(e);
 				} else {
 					usedKeybind = false;
