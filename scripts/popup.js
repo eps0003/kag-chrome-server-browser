@@ -396,7 +396,7 @@ function updateServers() {
 
 	addGamemodesToDropdown();
 
-	if (settings.autoSelectFirstServer) {
+	if (settings.autoSelectFirstServer && !getSelectedServer().length) {
 		selectServer($(".server:visible").first());
 	}
 
