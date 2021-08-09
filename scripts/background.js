@@ -198,8 +198,9 @@ function getDefaultSettings() {
 		badge: true,
 		badgeValue: "all",
 
-		notificationInterval: "6",
-		notificationVolume: 0,
+		notificationInterval: "0",
+		notificationVolume: 20,
+		notificationClick: true,
 
 		refreshInterval: 1,
 	};
