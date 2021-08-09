@@ -75,23 +75,35 @@ function processNotifications() {
 		}
 	});
 
-	chrome.storage.sync.get(["favorites", "notificationInterval", "notificationVolume"], ({ favorites, notificationInterval, notificationVolume }) => {
-		if (notificationInterval === "0") return;
+	chrome.storage.sync.get(["favorites", "notificationInterval", "notificationVolume", "passwords"], ({ favorites, notificationInterval, notificationVolume, passwords }) => {
+		if (notificationInterval == 0) return;
 
 		const notifications = [];
 
 		for (const fav of favorites) {
-			//previous players haven't been stored
-			if (previousPlayers[fav] === undefined) continue;
-
-			//find server
+			//get server
 			const server = servers.find((x) => fav === x.address);
 			if (!server) continue;
 
 			const floor = Math.floor(server.currentPlayers / notificationInterval) * notificationInterval;
 
-			if (previousPlayers[fav] < floor && server.currentPlayers >= floor) {
+			//initialize previous players if not set yet
+			if (previousPlayers[fav] === undefined) {
+				previousPlayers[fav] = floor;
+				continue;
+			}
+
+			//check if notification should be made
+			if (server.currentPlayers >= Math.ceil(previousPlayers[fav] / notificationInterval + 1) * notificationInterval) {
 				notifications.push(server);
+				previousPlayers[fav] = floor;
+			}
+
+			//reset previous players if server becomes empty
+			if (server.currentPlayers === 0) {
+				previousPlayers[fav] = 0;
+			} else if (server.currentPlayers < previousPlayers[fav] - notificationInterval) {
+				previousPlayers[fav] = Math.ceil(server.currentPlayers / notificationInterval) * notificationInterval;
 			}
 		}
 
@@ -99,7 +111,7 @@ function processNotifications() {
 			notifications.sort((a, b) => b.currentPlayers - a.currentPlayers);
 
 			let id = notifications[0].address;
-			let password = settings.passwords[fav];
+			let password = passwords[id];
 			if (password) id += `/${password}`;
 
 			chrome.notifications.create(id, {
