@@ -155,7 +155,7 @@ $(function () {
 				} else if (e.ctrlKey && e.key === "f") {
 					$("#favorites").click();
 				} else if (e.ctrlKey && e.key === " ") {
-					toggleFavoriteServer(".server.selected");
+					toggleFavoriteServer(getSelectedServer());
 				} else if (e.key === "Tab") {
 					//cycle through sort options
 					if (e.shiftKey) {
@@ -209,14 +209,14 @@ function scrollUpList(e) {
 	} else if (e.ctrlKey) {
 		if ($(".server.favorite:visible").length) {
 			//prev favorite
-			server = $(".server.selected").prevAll(".favorite:visible:first");
+			server = getSelectedServer().prevAll(".favorite:visible:first");
 			if (!$(server).length) {
 				server = $(".server.favorite:visible:last");
 			}
 		}
 	} else {
 		//prev server
-		server = $(".server.selected").prevAll(":visible:first");
+		server = getSelectedServer().prevAll(":visible:first");
 		if (!$(server).length) {
 			server = $(".server:visible:last");
 		}
@@ -240,14 +240,14 @@ function scrollDownList(e) {
 	} else if (e.ctrlKey) {
 		if ($(".server.favorite:visible").length) {
 			//next favorite
-			server = $(".server.selected").nextAll(".favorite:visible:first");
+			server = getSelectedServer().nextAll(".favorite:visible:first");
 			if (!$(server).length) {
 				server = $(".server.favorite:visible:first");
 			}
 		}
 	} else {
 		//next server
-		server = $(".server.selected").nextAll(":visible:first");
+		server = getSelectedServer().nextAll(":visible:first");
 		if (!$(server).length) {
 			server = $(".server:visible:first");
 		}
@@ -280,7 +280,7 @@ function reloadServers() {
 
 	canReload = false;
 
-	selectedServer = $(".server.selected").data("address");
+	selectedServer = getSelectedServer().data("address");
 
 	$("#server-grid").empty();
 	$("#count").text("Loading servers...");
@@ -634,9 +634,10 @@ function getIDFromIP(ip) {
 }
 
 function joinServer() {
-	const address = $(".server.selected").data("address");
+	const server = getSelectedServer();
+	const address = server.data("address");
 
-	if ($(".server.selected").hasClass("locked")) {
+	if (server.hasClass("locked")) {
 		let password = settings.passwords[address];
 		PasswordModal(`password-modal-${getIDFromIP(address)}`, password);
 	} else {
@@ -784,7 +785,7 @@ function updateServerInfo() {
 		getMinimap(server, function (img) {
 			server.minimap = img;
 
-			if ($(img).data("address") === $(".server.selected").data("address")) {
+			if ($(img).data("address") === getSelectedServer().data("address")) {
 				setMinimap(img);
 			}
 		});
