@@ -7,8 +7,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 	if (details.reason === "install") {
 		installedExtension(thisVersion);
 	} else if (details.reason === "update") {
-		const prevVersion = details.previousVersion;
-		updatedExtension(prevVersion, thisVersion);
+		updatedExtension(details.previousVersion, thisVersion);
 	}
 
 	displayMessage = details.reason;
@@ -18,7 +17,13 @@ function installedExtension(version) {
 	initSettings();
 }
 
-function updatedExtension(prevVersion, thisVersion) {}
+function updatedExtension(prevVersion, thisVersion) {
+	//reset settings on major release
+	if (thisVersion.charAt(0) !== prevVersion.charAt(0)) {
+		chrome.storage.sync.clear();
+		initSettings();
+	}
+}
 
 function receivedServers() {
 	updateBadge();
