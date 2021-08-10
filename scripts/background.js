@@ -10,6 +10,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
 		updatedExtension(details.previousVersion, thisVersion);
 	}
 
+	//set colors of badge icon on firefox the the same colors as on chrome
+	chrome.browserAction.setBadgeBackgroundColor({ color: [66, 133, 244, 255] });
+	chrome.browserAction.setBadgeTextColor({ color: "white" });
+
 	displayMessage = details.reason;
 });
 
