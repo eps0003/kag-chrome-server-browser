@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "KAG Server Browser",
 	"short_name": "KAG Servers",
-	"version": "3.0",
+	"version": "1.0",
 	"author": "epsilon",
 	"description": "The KAG server browser conveniently in your web browser!",
 	"permissions": ["storage", "notifications"],
