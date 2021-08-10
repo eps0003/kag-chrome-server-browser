@@ -139,6 +139,9 @@ a:hover {
 	margin: 4px;
 	overflow-y: scroll;
 	padding: 2px;
+
+	/* Firefox */
+	scrollbar-color: var(--button-background-color) var(--background-color);
 }
 
 #server-grid {
@@ -329,6 +332,9 @@ a:hover {
 	grid-area: info;
 	padding: 8px 0;
 	overflow-y: scroll;
+
+	/* Firefox */
+	scrollbar-width: none;
 }
 
 #info::-webkit-scrollbar {
