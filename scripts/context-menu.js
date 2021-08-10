@@ -1,6 +1,6 @@
 $(function () {
 	$(document).on("mousedown", function (e) {
-		if (isContextMenu(e.toElement)) return;
+		if (isContextMenu(e.target)) return;
 		closeContextMenu();
 	});
 
