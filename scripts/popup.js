@@ -642,6 +642,7 @@ function joinServer() {
 		PasswordModal(`password-modal-${getIDFromIP(address)}`, password);
 	} else {
 		window.location = "kag://" + address;
+		window.close();
 	}
 }
 
