@@ -120,12 +120,10 @@ function processNotifications() {
 			if (password) id += `/${password}`;
 
 			chrome.notifications.create(id, {
-				type: "list",
+				type: "basic",
 				title: "KAG Server Browser",
-				message: "",
-				items: notifications.map((x) => ({ title: `${x.currentPlayers}/${x.maxPlayers}`, message: x.name })),
+				message: notifications.map((x) => `${x.currentPlayers}/${x.maxPlayers} - ${x.name}`).join("\n"),
 				iconUrl: "images/kag_icon_128.png",
-				silent: true,
 			});
 
 			if (notificationVolume) {
