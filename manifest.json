@@ -27,5 +27,10 @@
 	"options_ui": {
 		"chrome_style": true,
 		"page": "html/options.html"
+	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "kag-server-browser@epsi.dev"
+		}
 	}
 }
